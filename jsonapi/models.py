@@ -11,302 +11,302 @@ from django.db import models
 
 
 class Contact(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    contactDbId = models.TextField(primary_key=True)
-    name = models.TextField(blank=True)
-    email = models.TextField(blank=True)
-    type = models.TextField(blank=True)
-    orcid = models.TextField(blank=True)
-    instituteName = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    contactDbId = models.TextField(primary_key=True, verbose_name=' contactDbId')
+    name = models.TextField(blank=True, verbose_name=' name')
+    email = models.TextField(blank=True, verbose_name=' email')
+    type = models.TextField(blank=True, verbose_name=' type')
+    orcid = models.TextField(blank=True, verbose_name=' orcid')
+    instituteName = models.TextField(blank=True, verbose_name=' instituteName')
 
 
 class Crop(models.Model):
-    cropDbId = models.TextField(primary_key=True)
-    commonName = models.TextField()
+    cropDbId = models.TextField(primary_key=True, verbose_name=' cropDbId')
+    commonName = models.TextField(verbose_name=' commonName')
 
 
 class Donor(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    germplasmDbId = models.ForeignKey('Germplasm')
-    donorAccessionNumber = models.TextField(blank=True)
-    donorInstituteCode = models.TextField(blank=True)
-    donorGermplasmPUI = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    donorAccessionNumber = models.TextField(blank=True, verbose_name=' donorAccessionNumber')
+    donorInstituteCode = models.TextField(blank=True, verbose_name=' donorInstituteCode')
+    donorGermplasmPUI = models.TextField(blank=True, verbose_name=' donorGermplasmPUI')
 
 
 class Germplasm(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    germplasmDbId = models.TextField(primary_key=True)
-    germplasmPUI = models.TextField(blank=True)
-    germplasmName = models.TextField()
-    defaultDisplayName = models.TextField()
-    accessionNumber = models.TextField(blank=True)
-    pedigree = models.TextField(blank=True)
-    seedSource = models.TextField(blank=True)
-    synonyms = models.TextField(blank=True)
-    instituteCode = models.TextField()
-    instituteName = models.TextField(blank=True)
-    biologicalStatusOfAccessionCode = models.TextField(blank=True)
-    countryOfOriginCode = models.TextField(blank=True)
-    typeOfGermplasmStorageCode = models.TextField(blank=True)
-    genus = models.TextField(blank=True)
-    species = models.TextField(blank=True)
-    speciesAuthority = models.TextField(blank=True)
-    subtaxa = models.TextField(blank=True)
-    subtaxaAuthority = models.TextField(blank=True)
-    acquisitionDate = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    germplasmDbId = models.TextField(primary_key=True, verbose_name=' germplasmDbId')
+    germplasmPUI = models.TextField(blank=True, verbose_name=' germplasmPUI')
+    germplasmName = models.TextField(verbose_name=' germplasmName')
+    defaultDisplayName = models.TextField(verbose_name=' defaultDisplayName')
+    accessionNumber = models.TextField(blank=True, verbose_name=' accessionNumber')
+    pedigree = models.TextField(blank=True, verbose_name=' pedigree')
+    seedSource = models.TextField(blank=True, verbose_name=' seedSource')
+    synonyms = models.TextField(blank=True, verbose_name=' synonyms')
+    instituteCode = models.TextField(verbose_name=' instituteCode')
+    instituteName = models.TextField(blank=True, verbose_name=' instituteName')
+    biologicalStatusOfAccessionCode = models.TextField(blank=True, verbose_name=' biologicalStatusOfAccessionCode')
+    countryOfOriginCode = models.TextField(blank=True, verbose_name=' countryOfOriginCode')
+    typeOfGermplasmStorageCode = models.TextField(blank=True, verbose_name=' typeOfGermplasmStorageCode')
+    genus = models.TextField(blank=True, verbose_name=' genus')
+    species = models.TextField(blank=True, verbose_name=' species')
+    speciesAuthority = models.TextField(blank=True, verbose_name=' speciesAuthority')
+    subtaxa = models.TextField(blank=True, verbose_name=' subtaxa')
+    subtaxaAuthority = models.TextField(blank=True, verbose_name=' subtaxaAuthority')
+    acquisitionDate = models.TextField(blank=True, verbose_name=' acquisitionDate')
 
 
 class GermplasmAttribute(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    attributeCategoryDbId = models.ForeignKey('GermplasmAttributeCategory')
-    attributeDbId = models.TextField(unique=True)
-    code = models.TextField(blank=True)
-    uri = models.TextField(blank=True)
-    name = models.TextField()
-    description = models.TextField(blank=True)
-    datatype = models.TextField(blank=True)
-    values = models.TextField(blank=True)  # This field type is a guess.
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    attributeCategoryDbId = models.ForeignKey('GermplasmAttributeCategory', verbose_name=' attributeCategoryDbId')
+    attributeDbId = models.TextField(unique=True, verbose_name=' attributeDbId')
+    code = models.TextField(blank=True, verbose_name=' code')
+    uri = models.TextField(blank=True, verbose_name=' uri')
+    name = models.TextField(verbose_name=' name')
+    description = models.TextField(blank=True, verbose_name=' description')
+    datatype = models.TextField(blank=True, verbose_name=' datatype')
+    values = models.TextField(blank=True, verbose_name=' values')  # This field type is a guess.
 
 
 class GermplasmAttributeCategory(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    attributeCategoryDbId = models.TextField(unique=True)
-    attributeCategoryName = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    attributeCategoryDbId = models.TextField(unique=True, verbose_name=' attributeCategoryDbId')
+    attributeCategoryName = models.TextField(blank=True, verbose_name=' attributeCategoryName')
 
 
 class GermplasmAttributeValue(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    germplasmDbId = models.ForeignKey('Germplasm')
-    attributeDbId = models.ForeignKey('GermplasmAttribute')
-    determinedDate = models.TextField(blank=True)
-    value = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    attributeDbId = models.ForeignKey('GermplasmAttribute', verbose_name=' attributeDbId')
+    determinedDate = models.TextField(blank=True, verbose_name=' determinedDate')
+    value = models.TextField(verbose_name=' value')
 
 
 class Location(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    locationDbId = models.TextField(primary_key=True)
-    type = models.TextField(blank=True)
-    name = models.TextField(blank=True)
-    abbreviation = models.TextField(blank=True)
-    countryCode = models.TextField(blank=True)
-    countryName = models.TextField(blank=True)
-    latitude = models.TextField(blank=True)  # This field type is a guess.
-    longitude = models.TextField(blank=True)  # This field type is a guess.
-    altitude = models.TextField(blank=True)  # This field type is a guess.
-    instituteName = models.TextField(blank=True)
-    instituteAddress = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    locationDbId = models.TextField(primary_key=True, verbose_name=' locationDbId')
+    type = models.TextField(blank=True, verbose_name=' type')
+    name = models.TextField(blank=True, verbose_name=' name')
+    abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
+    countryCode = models.TextField(blank=True, verbose_name=' countryCode')
+    countryName = models.TextField(blank=True, verbose_name=' countryName')
+    latitude = models.TextField(blank=True, verbose_name=' latitude')  # This field type is a guess.
+    longitude = models.TextField(blank=True, verbose_name=' longitude')  # This field type is a guess.
+    altitude = models.TextField(blank=True, verbose_name=' altitude')  # This field type is a guess.
+    instituteName = models.TextField(blank=True, verbose_name=' instituteName')
+    instituteAddress = models.TextField(blank=True, verbose_name=' instituteAddress')
 
 
 class LocationAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    locationDbId = models.ForeignKey('Location')
-    key = models.TextField()
-    value = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    locationDbId = models.ForeignKey('Location', verbose_name=' locationDbId')
+    key = models.TextField(verbose_name=' key')
+    value = models.TextField(verbose_name=' value')
 
 
 class Map(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    mapDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    mapDbId = models.TextField(primary_key=True, verbose_name=' mapDbId')
 
 
 class Marker(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    markerDbId = models.TextField(primary_key=True)
-    defaultDisplayName = models.TextField(blank=True)
-    type = models.TextField(blank=True)
-    synonyms = models.TextField(blank=True)
-    refAlt = models.TextField(blank=True)
-    analysisMethods = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    markerDbId = models.TextField(primary_key=True, verbose_name=' markerDbId')
+    defaultDisplayName = models.TextField(blank=True, verbose_name=' defaultDisplayName')
+    type = models.TextField(blank=True, verbose_name=' type')
+    synonyms = models.TextField(blank=True, verbose_name=' synonyms')
+    refAlt = models.TextField(blank=True, verbose_name=' refAlt')
+    analysisMethods = models.TextField(blank=True, verbose_name=' analysisMethods')
 
 
 class Markerprofile(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    markerProfileDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    markerProfileDbId = models.TextField(primary_key=True, verbose_name=' markerProfileDbId')
 
 
 class Method(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    methodDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    methodDbId = models.TextField(primary_key=True, verbose_name=' methodDbId')
 
 
 class Observation(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    observationUnitDbId = models.ForeignKey('ObservationUnit')
-    observationVariableDbId = models.ForeignKey('ObservationVariable')
-    observationTimeStamp = models.TextField(blank=True)
-    observationDbId = models.TextField(primary_key=True)
-    seasonDbId = models.ForeignKey('Season')
-    collector = models.TextField(blank=True)
-    value = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
+    observationVariableDbId = models.ForeignKey('ObservationVariable', verbose_name=' observationVariableDbId')
+    observationTimeStamp = models.TextField(blank=True, verbose_name=' observationTimeStamp')
+    observationDbId = models.TextField(primary_key=True, verbose_name=' observationDbId')
+    seasonDbId = models.ForeignKey('Season', verbose_name=' seasonDbId')
+    collector = models.TextField(blank=True, verbose_name=' collector')
+    value = models.TextField(blank=True, verbose_name=' value')
 
 
 class ObservationUnit(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    studyDbId = models.ForeignKey('Study')
-    germplasmDbId = models.ForeignKey('Germplasm')
-    observationUnitDbId = models.TextField(unique=True)
-    name = models.TextField()
-    observationUnitLevel = models.TextField(blank=True)
-    observationUnitLevels = models.TextField(blank=True)
-    entryNumber = models.TextField(blank=True)
-    entryType = models.TextField(blank=True)
-    plotNumber = models.TextField(blank=True)
-    blockNumber = models.TextField(blank=True)
-    plantNumber = models.TextField(blank=True)
-    x = models.TextField(blank=True)
-    y = models.TextField(blank=True)
-    replicate = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    observationUnitDbId = models.TextField(unique=True, verbose_name=' observationUnitDbId')
+    name = models.TextField(verbose_name=' name')
+    observationUnitLevel = models.TextField(blank=True, verbose_name=' observationUnitLevel')
+    observationUnitLevels = models.TextField(blank=True, verbose_name=' observationUnitLevels')
+    entryNumber = models.TextField(blank=True, verbose_name=' entryNumber')
+    entryType = models.TextField(blank=True, verbose_name=' entryType')
+    plotNumber = models.TextField(blank=True, verbose_name=' plotNumber')
+    blockNumber = models.TextField(blank=True, verbose_name=' blockNumber')
+    plantNumber = models.TextField(blank=True, verbose_name=' plantNumber')
+    x = models.TextField(blank=True, verbose_name=' x')
+    y = models.TextField(blank=True, verbose_name=' y')
+    replicate = models.TextField(blank=True, verbose_name=' replicate')
 
 
 class ObservationUnitTreatment(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    observationUnitDbId = models.ForeignKey('ObservationUnit')
-    factor = models.TextField()
-    modality = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
+    factor = models.TextField(verbose_name=' factor')
+    modality = models.TextField(verbose_name=' modality')
 
 
 class ObservationUnitXref(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    observationUnitDbId = models.ForeignKey('ObservationUnit')
-    source = models.TextField()
-    id = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
+    source = models.TextField(verbose_name=' source')
+    id = models.TextField(primary_key=True, verbose_name=' id')
 
 
 class ObservationVariable(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    ontologyDbId = models.ForeignKey('Ontology')
-    observationVariableDbId = models.TextField(unique=True)
-    traitDbId = models.ForeignKey('Trait')
-    methodDbId = models.ForeignKey('Method')
-    scaleDbId = models.ForeignKey('Scale')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    ontologyDbId = models.ForeignKey('Ontology', verbose_name=' ontologyDbId')
+    observationVariableDbId = models.TextField(unique=True, verbose_name=' observationVariableDbId')
+    traitDbId = models.ForeignKey('Trait', verbose_name=' traitDbId')
+    methodDbId = models.ForeignKey('Method', verbose_name=' methodDbId')
+    scaleDbId = models.ForeignKey('Scale', verbose_name=' scaleDbId')
 
 
 class Ontology(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    ontologyDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    ontologyDbId = models.TextField(primary_key=True, verbose_name=' ontologyDbId')
 
 
 class Pedigree(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    germplasmDbId = models.ForeignKey('Germplasm', related_name='pedigreeObject')
-    pedigree = models.TextField(primary_key=True)
-    parent1Id = models.ForeignKey('Germplasm', related_name='pedigreeChild1')
-    parent2Id = models.ForeignKey('Germplasm', related_name='pedigreeChild2')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId', related_name='pedigreeObject')
+    pedigree = models.TextField(verbose_name=' pedigree')
+    parent1Id = models.ForeignKey('Germplasm', verbose_name=' parent1Id', related_name='pedigreeChild1')
+    parent2Id = models.ForeignKey('Germplasm', verbose_name=' parent2Id', related_name='pedigreeChild2')
 
 
 class Program(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    programDbId = models.TextField(primary_key=True)
-    name = models.TextField()
-    abbreviation = models.TextField(blank=True)
-    objective = models.TextField(blank=True)
-    leadPerson = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    programDbId = models.TextField(primary_key=True, verbose_name=' programDbId')
+    name = models.TextField(verbose_name=' name')
+    abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
+    objective = models.TextField(blank=True, verbose_name=' objective')
+    leadPerson = models.TextField(blank=True, verbose_name=' leadPerson')
 
 
 class Sample(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    sampleDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    sampleDbId = models.TextField(primary_key=True, verbose_name=' sampleDbId')
 
 
 class Scale(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    scaleDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    scaleDbId = models.TextField(primary_key=True, verbose_name=' scaleDbId')
 
 
 class Season(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    seasonDbId = models.TextField(primary_key=True)
-    year = models.TextField(blank=True)
-    season = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    seasonDbId = models.TextField(primary_key=True, verbose_name=' seasonDbId')
+    year = models.TextField(blank=True, verbose_name=' year')
+    season = models.TextField(blank=True, verbose_name=' season')
 
 
 class Study(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    trialDbId = models.ForeignKey('Trial')
-    locationDbId = models.ForeignKey('Location')
-    studyType = models.ForeignKey('StudyType')
-    studyDbId = models.TextField(primary_key=True)
-    name = models.TextField()
-    description = models.TextField(blank=True)
-    startDate = models.TextField(blank=True)
-    endDate = models.TextField(blank=True)
-    active = models.NullBooleanField()
-    license = models.TextField(blank=True)
-    lastUpdateVersion = models.TextField(blank=True)
-    lastUpdateTimestamp = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
+    locationDbId = models.ForeignKey('Location', verbose_name=' locationDbId')
+    studyType = models.ForeignKey('StudyType', verbose_name=' studyType')
+    studyDbId = models.TextField(primary_key=True, verbose_name=' studyDbId')
+    name = models.TextField(verbose_name=' name')
+    description = models.TextField(blank=True, verbose_name=' description')
+    startDate = models.TextField(blank=True, verbose_name=' startDate')
+    endDate = models.TextField(blank=True, verbose_name=' endDate')
+    active = models.NullBooleanField(verbose_name=' active')
+    license = models.TextField(blank=True, verbose_name=' license')
+    lastUpdateVersion = models.TextField(blank=True, verbose_name=' lastUpdateVersion')
+    lastUpdateTimestamp = models.TextField(blank=True, verbose_name=' lastUpdateTimestamp')
 
 
 class StudyAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    studyDbId = models.ForeignKey('Study')
-    key = models.TextField()
-    value = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    key = models.TextField(verbose_name=' key')
+    value = models.TextField(verbose_name=' value')
 
 
 class StudyContact(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    studyDbId = models.ForeignKey('Study')
-    contactDbId = models.ForeignKey('Contact')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    contactDbId = models.ForeignKey('Contact', verbose_name=' contactDbId')
 
 
 class StudyDataLink(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    studyDbId = models.ForeignKey('Study')
-    name = models.TextField(blank=True)
-    type = models.TextField(blank=True)
-    url = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    name = models.TextField(blank=True, verbose_name=' name')
+    type = models.TextField(blank=True, verbose_name=' type')
+    url = models.TextField(verbose_name=' url')
 
 
 class StudySeason(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    studyDbId = models.ForeignKey('Study')
-    seasonDbId = models.ForeignKey('Season')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    seasonDbId = models.ForeignKey('Season', verbose_name=' seasonDbId')
 
 
 class StudyType(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    name = models.TextField(unique=True)
-    description = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    name = models.TextField(unique=True, verbose_name=' name')
+    description = models.TextField(blank=True, verbose_name=' description')
 
 
 class TaxonXref(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    taxonDbId = models.TextField(unique=True)
-    source = models.TextField()
-    rank = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    taxonDbId = models.TextField(unique=True, verbose_name=' taxonDbId')
+    source = models.TextField(verbose_name=' source')
+    rank = models.TextField(blank=True, verbose_name=' rank')
 
 
 class TaxonXrefGermplasm(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    taxonDbId = models.ForeignKey('TaxonXref')
-    germplasmDbId = models.ForeignKey('Germplasm')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    taxonDbId = models.ForeignKey('TaxonXref', verbose_name=' taxonDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
 
 
 class Trait(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    traitDbId = models.TextField(primary_key=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    traitDbId = models.TextField(primary_key=True, verbose_name=' traitDbId')
 
 
 class Trial(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    programDbId = models.ForeignKey('Program')
-    trialDbId = models.TextField(primary_key=True)
-    name = models.TextField()
-    startDate = models.TextField(blank=True)
-    endDate = models.TextField(blank=True)
-    active = models.NullBooleanField()
-    datasetAuthorshipLicence = models.TextField(blank=True)
-    datasetAuthorshipDatasetPUI = models.TextField(blank=True)
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    programDbId = models.ForeignKey('Program', verbose_name=' programDbId')
+    trialDbId = models.TextField(primary_key=True, verbose_name=' trialDbId')
+    name = models.TextField(verbose_name=' name')
+    startDate = models.TextField(blank=True, verbose_name=' startDate')
+    endDate = models.TextField(blank=True, verbose_name=' endDate')
+    active = models.NullBooleanField(verbose_name=' active')
+    datasetAuthorshipLicence = models.TextField(blank=True, verbose_name=' datasetAuthorshipLicence')
+    datasetAuthorshipDatasetPUI = models.TextField(blank=True, verbose_name=' datasetAuthorshipDatasetPUI')
 
 
 class TrialAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    trialDbId = models.ForeignKey('Trial')
-    key = models.TextField()
-    value = models.TextField()
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
+    key = models.TextField(verbose_name=' key')
+    value = models.TextField(verbose_name=' value')
 
 
 class TrialContact(models.Model):
-    cropDbId = models.ForeignKey('Crop')
-    trialDbId = models.ForeignKey('Trial')
-    contactDbId = models.ForeignKey('Contact')
+    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
+    contactDbId = models.ForeignKey('Contact', verbose_name=' contactDbId')

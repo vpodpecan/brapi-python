@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load admin_urls %}
+
+{# <li><a href="{% url opts|admin_urlname:'export' %}{{cl.get_query_string}}" class="export_link">{% trans "Export" %}</a></li>#}
+
+
+<li><a href="{% url opts|admin_urlname:'export' %}{{cl.get_query_string}}" class="export_link btn btn-primary btn-xs" title=""
+        data-placement="left" data-toggle="tooltip" role="button" data-original-title="Export">
+<span class="glyphicon glyphicon-export"></span></a></li>
