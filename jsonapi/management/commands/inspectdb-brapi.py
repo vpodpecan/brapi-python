@@ -117,8 +117,12 @@ class Command(BaseCommand):
                     column_to_field_name[column_name] = att_name
 
                     # Add primary_key and unique, if necessary.
+                    # print (('------>', column_name, primary_key_column))
                     if column_name == primary_key_column or ('dbid' in column_name.lower() and column_name.lower().replace('dbid', '') == table_name.lower()) or column_name == 'id':
                         extra_params['primary_key'] = True
+                        # extra_params['unique'] = True
+                        # extra_params['blank'] = True
+                        # print (('--->',column_name))
                     elif column_name in unique_columns:
                         extra_params['unique'] = True
 

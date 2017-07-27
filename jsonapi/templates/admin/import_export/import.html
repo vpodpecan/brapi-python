@@ -24,8 +24,15 @@
 
           <div class="panel panel-default">
             <div class="panel-body">
-                <strong> {% trans "This importer will import the following fields: " %} </strong> </br>
-                <code>{{ fields|join:", " }}</code>
+                <div>
+                    <strong> {% trans "This importer will import the following fields: " %} </strong> </br>
+                    <code>{{ fields|join:", " }}</code>
+                </div>
+
+                {% if 'id' in fields %}
+                    <span class="label label-info">Note</span>
+                    The leading <strong>id</strong> field may be omitted if not present in original database schema (it was automatically added by the system).
+                {% endif %}
             </div>
           </div>
 

@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load admin_urls %}
 {% load import_export_tags %}
+{% load bootstrap3 %}
 
 {% block breadcrumbs_last %}
 {% trans "Export" %}
@@ -11,24 +12,11 @@
 <form action="" method="POST">
   {% csrf_token %}
 
-    <fieldset class="module aligned">
-      {% for field in form %}
-        <div class="form-row">
-          {{ field.errors }}
+  {% bootstrap_form form %}
 
-          {{ field.label_tag }}
+  <div class="submit-row">
+      <button type="submit" class="btn btn-success" name="confirm" value=>{% trans "Export" %}</button>
+  </div>
 
-          {{ field }}
-
-          {% if field.field.help_text %}
-          <p class="help">{{ field.field.help_text|safe }}</p>
-          {% endif %}
-        </div>
-      {% endfor %}
-    </fieldset>
-
-    <div class="submit-row">
-      <input type="submit" class="default" value="{% trans "Submit" %}">
-    </div>
 </form>
 {% endblock %}

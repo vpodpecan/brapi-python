@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'jsonapi.apps.JsonapiConfig',
-    # 'django_admin_bootstrapped',
     'bootstrap_admin',
     'django.contrib.admin',
     'django.contrib.auth',
