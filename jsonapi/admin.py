@@ -17,8 +17,6 @@ from jsonapi import models
 # # admin.site.register(models.Crop)
 
 
-#NOIMPORT_MODELS = [StudySeason, StudyContact, TaxonXrefGermplasm, TrialContact]
-
 
 class CustomInstanceLoader(instance_loaders.ModelInstanceLoader):
     def get_instance(self, row):
@@ -106,7 +104,7 @@ for model_name, model in app.models.items():
     elif model == models.TaxonXrefGermplasm:
         pks = ['cropDbId', 'taxonDbId', 'germplasmDbId']
     elif model == models.TrialAdditionalInfo:
-        pks = ['cropDbId', 'trialDbId', 'key']
+        pks = ['cropDbId', 'trialDbId', 'key', 'value']
     elif model == models.TrialContact:
         pks = ['cropDbId', 'trialDbId', 'contactDbId']
     else:

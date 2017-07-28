@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'jsonapi.apps.JsonapiConfig',
     'bootstrap_admin',
     'django.contrib.admin',
+    'oauth2_provider',
+    'corsheaders',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -148,3 +151,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 MEDIA_URL = '/media/'
 
 BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
+
+
+
+CORS_ORIGIN_ALLOW_ALL = True

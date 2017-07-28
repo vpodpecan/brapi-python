@@ -27,7 +27,7 @@ class Contact(models.Model):
     instituteName = models.TextField(blank=True, verbose_name=' instituteName')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class Crop(models.Model):
@@ -35,7 +35,7 @@ class Crop(models.Model):
     commonName = models.TextField(verbose_name=' commonName')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.commonName)
+        return '{}: {}'.format(self.pk, self.commonName)
 
 
 class Donor(models.Model):
@@ -46,7 +46,7 @@ class Donor(models.Model):
     donorGermplasmPUI = models.TextField(blank=True, verbose_name=' donorGermplasmPUI')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.donorAccessionNumber)
+        return '{}: {}'.format(self.pk, self.donorAccessionNumber)
 
 
 class Germplasm(models.Model):
@@ -72,7 +72,7 @@ class Germplasm(models.Model):
     acquisitionDate = models.TextField(blank=True, verbose_name=' acquisitionDate')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.germplasmName)
+        return '{}: {}'.format(self.pk, self.germplasmName)
 
     class Meta:
         verbose_name_plural = 'Germplasm'
@@ -90,7 +90,7 @@ class GermplasmAttribute(models.Model):
     values = models.TextField(blank=True, verbose_name=' values')  # This field type is a guess.
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class GermplasmAttributeCategory(models.Model):
@@ -99,7 +99,7 @@ class GermplasmAttributeCategory(models.Model):
     attributeCategoryName = models.TextField(blank=True, verbose_name=' attributeCategoryName')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.attributeCategoryName)
+        return '{}: {}'.format(self.pk, self.attributeCategoryName)
 
     class Meta:
         verbose_name_plural = 'GermplasmAttributeCategories'
@@ -113,7 +113,7 @@ class GermplasmAttributeValue(models.Model):
     value = models.TextField(verbose_name=' value')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.value)
+        return '{}: {}'.format(self.pk, self.value)
 
 
 class Location(models.Model):
@@ -131,7 +131,7 @@ class Location(models.Model):
     instituteAddress = models.TextField(blank=True, verbose_name=' instituteAddress')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class LocationAdditionalInfo(models.Model):
@@ -141,7 +141,7 @@ class LocationAdditionalInfo(models.Model):
     value = models.TextField(verbose_name=' value')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.value[:15])
+        return '{}: {}'.format(self.pk, self.value[:15])
 
     class Meta:
         verbose_name_plural = 'LocationAdditionalInfo'
@@ -165,7 +165,7 @@ class Marker(models.Model):
     analysisMethods = models.TextField(blank=True, verbose_name=' analysisMethods')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.defaultDisplayName)
+        return '{}: {}'.format(self.pk, self.defaultDisplayName)
 
 
 class Markerprofile(models.Model):
@@ -195,7 +195,7 @@ class Observation(models.Model):
     value = models.TextField(blank=True, verbose_name=' value')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.value[:15])
+        return '{}: {}'.format(self.pk, self.value[:15])
 
 
 class ObservationUnit(models.Model):
@@ -216,7 +216,7 @@ class ObservationUnit(models.Model):
     replicate = models.TextField(blank=True, verbose_name=' replicate')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class ObservationUnitTreatment(models.Model):
@@ -236,7 +236,7 @@ class ObservationUnitXref(models.Model):
     id = models.TextField(primary_key=True, verbose_name=' id')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.source)
+        return '{}: {}'.format(self.pk, self.source)
 
 
 class ObservationVariable(models.Model):
@@ -270,7 +270,7 @@ class Pedigree(models.Model):
     parent2Id = models.ForeignKey('Germplasm', verbose_name=' parent2Id', related_name='pedigreeChild2')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.pedigree[:15])
+        return '{}: {}'.format(self.pk, self.pedigree[:15])
 
 
 class Program(models.Model):
@@ -282,7 +282,7 @@ class Program(models.Model):
     leadPerson = models.TextField(blank=True, verbose_name=' leadPerson')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class Sample(models.Model):
@@ -308,7 +308,7 @@ class Season(models.Model):
     season = models.TextField(blank=True, verbose_name=' season')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.season[:15])
+        return '{}: {}'.format(self.pk, self.season[:15])
 
 
 class Study(models.Model):
@@ -327,7 +327,7 @@ class Study(models.Model):
     lastUpdateTimestamp = models.TextField(blank=True, verbose_name=' lastUpdateTimestamp')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
     class Meta:
         verbose_name_plural = 'Studies'
@@ -340,7 +340,7 @@ class StudyAdditionalInfo(models.Model):
     value = models.TextField(verbose_name=' value')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.value[:15])
+        return '{}: {}'.format(self.pk, self.value[:15])
 
     class Meta:
         verbose_name_plural = 'StudyAdditionalInfo'
@@ -363,7 +363,7 @@ class StudyDataLink(models.Model):
     url = models.TextField(verbose_name=' url')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class StudySeason(models.Model):
@@ -381,7 +381,7 @@ class StudyType(models.Model):
     description = models.TextField(blank=True, verbose_name=' description')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class TaxonXref(models.Model):
@@ -391,7 +391,7 @@ class TaxonXref(models.Model):
     rank = models.TextField(blank=True, verbose_name=' rank')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.source)
+        return '{}: {}'.format(self.pk, self.source)
 
 
 class TaxonXrefGermplasm(models.Model):
@@ -426,7 +426,7 @@ class Trial(models.Model):
     datasetAuthorshipDatasetPUI = models.TextField(blank=True, verbose_name=' datasetAuthorshipDatasetPUI')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.name)
 
 
 class TrialAdditionalInfo(models.Model):
@@ -436,7 +436,7 @@ class TrialAdditionalInfo(models.Model):
     value = models.TextField(verbose_name=' value')
 
     def __str__(self):
-        return '{} {}'.format(self.pk, self.value[:15])
+        return '{}: {}'.format(self.pk, self.value[:15])
 
     class Meta:
         verbose_name_plural = 'TrialAdditionalInfo'

@@ -14,7 +14,7 @@
 atlassian-ide-plugin.xml
 *.sublime-*
 
-*.sqlite3
+#*.sqlite3
 
 media_root/*
 static_root/*
