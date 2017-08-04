@@ -120,7 +120,7 @@ class Location(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     locationDbId = models.TextField(primary_key=True, verbose_name=' locationDbId')
     type = models.TextField(blank=True, verbose_name=' type')
-    name = models.TextField(blank=True, verbose_name=' name')
+    locationName = models.TextField(blank=True, verbose_name=' locationName')
     abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
     countryCode = models.TextField(blank=True, verbose_name=' countryCode')
     countryName = models.TextField(blank=True, verbose_name=' countryName')
@@ -131,7 +131,7 @@ class Location(models.Model):
     instituteAddress = models.TextField(blank=True, verbose_name=' instituteAddress')
 
     def __str__(self):
-        return '{}: {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.locationName)
 
 
 class LocationAdditionalInfo(models.Model):
@@ -276,13 +276,13 @@ class Pedigree(models.Model):
 class Program(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     programDbId = models.TextField(primary_key=True, verbose_name=' programDbId')
-    name = models.TextField(verbose_name=' name')
+    programName = models.TextField(verbose_name=' programName')
     abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
     objective = models.TextField(blank=True, verbose_name=' objective')
     leadPerson = models.TextField(blank=True, verbose_name=' leadPerson')
 
     def __str__(self):
-        return '{}: {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.programName)
 
 
 class Sample(models.Model):
@@ -317,7 +317,7 @@ class Study(models.Model):
     locationDbId = models.ForeignKey('Location', verbose_name=' locationDbId')
     studyType = models.ForeignKey('StudyType', verbose_name=' studyType')
     studyDbId = models.TextField(primary_key=True, verbose_name=' studyDbId')
-    name = models.TextField(verbose_name=' name')
+    studyName = models.TextField(verbose_name=' studyName')
     description = models.TextField(blank=True, verbose_name=' description')
     startDate = models.TextField(blank=True, verbose_name=' startDate')
     endDate = models.TextField(blank=True, verbose_name=' endDate')
@@ -327,7 +327,7 @@ class Study(models.Model):
     lastUpdateTimestamp = models.TextField(blank=True, verbose_name=' lastUpdateTimestamp')
 
     def __str__(self):
-        return '{}: {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.studyName)
 
     class Meta:
         verbose_name_plural = 'Studies'
@@ -418,7 +418,7 @@ class Trial(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     programDbId = models.ForeignKey('Program', verbose_name=' programDbId')
     trialDbId = models.TextField(primary_key=True, verbose_name=' trialDbId')
-    name = models.TextField(verbose_name=' name')
+    trialName = models.TextField(verbose_name=' trialName')
     startDate = models.TextField(blank=True, verbose_name=' startDate')
     endDate = models.TextField(blank=True, verbose_name=' endDate')
     active = models.NullBooleanField(verbose_name=' active')
@@ -426,7 +426,7 @@ class Trial(models.Model):
     datasetAuthorshipDatasetPUI = models.TextField(blank=True, verbose_name=' datasetAuthorshipDatasetPUI')
 
     def __str__(self):
-        return '{}: {}'.format(self.pk, self.name)
+        return '{}: {}'.format(self.pk, self.trialName)
 
 
 class TrialAdditionalInfo(models.Model):

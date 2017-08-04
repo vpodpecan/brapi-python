@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    url(r'', include('jsonapi.urls')),
+    url(r'^brapi/v1/', include('jsonapi.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
