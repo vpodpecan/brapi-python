@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^germplasm-search/$', views.GermplasmSearch.as_view()),
     url(r'^programs/$', views.ProgramList.as_view()),
     url(r'^trials/(?P<trialDbId>[^ /]+)/$', views.TrialDetails.as_view()),
-
+    url(r'^trials/$', views.TrialList.as_view()),
 ]

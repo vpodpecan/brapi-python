@@ -11,53 +11,6 @@ from jsonapi import serializers, models
 
 DEF_PAGE_SIZE = 1000
 HTTP_BAD_REQUEST_CODE = 400
-#
-#
-# @csrf_exempt
-# def germplasm_details(request, pk):
-#     """
-#     Germplasm Details by germplasmDbId
-#     """
-#     try:
-#         gp = models.Germplasm.objects.get(germplasmDbId=pk)
-#     except models.Germplasm.DoesNotExist:
-#         return JsonResponse('Germplasm with id {} does not exist'.format(pk), status=404)
-#
-#     gp = models.Germplasm.objects.all()
-#     if request.method in ['GET', 'POST']:
-#         serializer = serializers.GermplasmDetailsSerializer(gp, many=True)
-#         return JsonResponse(serializer.data, safe=False)
-#     else:
-#         return JsonResponse(serializer.errors, status=400)
-#
-#
-
-
-#
-#
-#
-# def buildResponse(**kwargs):
-#     out = {}
-#
-#
-#
-#  {
-#       "metadata" : {
-#            "pagination": {
-#               "pageSize":0,
-#               "currentPage":0,
-#               "totalCount":0,
-#               "totalPages":0
-#           },
-#           "status" : [ {
-#               "message": "Unable to parse POST request",
-#               "code" : ""
-#           } ],
-#           "datafiles": []
-#       },
-#       "result": {}
-#   }
-
 
 
 class JSONResponseMixin(object):
@@ -82,9 +35,10 @@ class JSONResponseMixin(object):
     def buildResponse(self, results, pagination={"pageSize": 0, "currentPage": 0, "totalCount": 0, "totalPages": 0}, status=[], datafiles=[]):
         output = {}
         output['result'] = results
-        output['pagination'] = pagination
-        output['status'] = status
-        output['datafiles'] = datafiles
+        output['metadata'] = {}
+        output['metadata']['pagination'] = pagination
+        output['metadata']['status'] = status
+        output['metadata']['datafiles'] = datafiles
         return output
 
     def render_to_response(self, context, **response_kwargs):
@@ -93,26 +47,46 @@ class JSONResponseMixin(object):
     def render_to_json_response(self, context, **response_kwargs):
         return JsonResponse(self.get_data(context), **response_kwargs)
 
+    def get_post_or_get(self, request):
+        # we will handle both types of requests for all calls
+        # simulate depretaced request.REQUEST
+        return request.POST or request.GET
+
+    def get_objects(self, kwargs):
+        objects = self.model.objects.filter(**kwargs)
+        return objects
+
     def get_data(self, context):
+        request = self.get_post_or_get(self.request)
+
         # sanity: fail if there are unwanted parameters
-        extra = set(self.request.GET.keys()) - set(self.query_parameters) - set(['page', 'pageSize'])
+        extra = set(request.keys()) - set(self.query_parameters) - set(['page', 'pageSize'])
         if extra != set():
             return self.buildErrorResponse('Invalid query pararameter(s) {}'.format(extra), HTTP_BAD_REQUEST_CODE)
 
         # 1. construct query
         kwargs = {}
         for param in self.query_parameters:
-            val = self.request.GET.get(param)
+            val = request.get(param)
             if val:
                 kwargs[param] = val
-
         # print(kwargs)
+
         # 2. execute query and make pagination
-        # objects = models.Program.objects.filter(**kwargs)
-        objects = self.model.objects.filter(**kwargs)
+        objects = self.get_objects(kwargs)
+        # try:
+        #     objects = self.get_objects(kwargs)
+        # except Exception as e:
+        #     return self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE)
+
+        # try:
+        #     objects = self.model.objects.filter(**kwargs)
+        # except Exception as e:
+        #     return self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE)
+
         try:
-            pagesize = int(self.request.GET.get('pageSize', DEF_PAGE_SIZE))
-            page = int(self.request.GET.get('page', 0)) + 1  # BRAPI wants zero page indexing...
+            pagesize = int(request.get('pageSize', DEF_PAGE_SIZE))
+            page = int(request.get('page', 0)) + 1  # BRAPI wants zero page indexing...
         except:
             return self.buildErrorResponse('Invalid page or pageSize parameter', HTTP_BAD_REQUEST_CODE)
 
@@ -179,3 +153,23 @@ class TrialDetails(JSONResponseMixinDetails, TemplateView):
     model = models.Trial
     serializer = serializers.TrialDetailsSerializer
     pk = 'trialDbId'
+
+
+class TrialList(JSONResponseMixin, TemplateView):
+    model = models.Trial
+    serializer = serializers.TrialDetailsSerializer
+    query_parameters = ['programDbId', 'locationDbId', 'active', ]
+
+    def get_objects(self, kwargs):
+        if 'locationDbId' in kwargs:
+            studies = models.Study.objects.filter(locationDbId=kwargs['locationDbId'])
+            # objects = 
+
+            models.Trial.objects.filter(locationDbId__in=studies)
+        else:
+            objects = self.model.objects
+        return objects.filter(**kwargs)
+
+#objects = self.model.objects.filter(**kwargs)
+#     studies = models.Study.objects.filter(locationDbId=locationDbId)
+#     trials = models.Trial.objects.filter()
