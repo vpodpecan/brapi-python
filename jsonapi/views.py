@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
@@ -45,43 +45,28 @@ class JSONResponseMixin(object):
         output['metadata']['datafiles'] = datafiles
         return output
 
-    def render_to_response(self, context, **response_kwargs):
-        return self.render_to_json_response(context, **response_kwargs)
+    def check_GET_parameters(self, pdict):
+        return set(pdict.keys()) - set(self.get_parameters)
 
-    def render_to_json_response(self, context, **response_kwargs):
-        return JsonResponse(self.get_data(context), **response_kwargs)
+    def check_POST_parameters(self, pdict):
+        return set(pdict.keys()) - set(self.post_json_parameters)
 
-    # def get_post_or_get(self, request):
-    #     # we will handle both types of requests for all calls
-    #     # simulate depretaced request.REQUEST
-    #
-    #     if request.is_ajax():
-    #         print('Raw data')
-    #         print(str(request.body))
-    #
-    #     return request.POST or request.GET
+    def get_objects_GET(self, requestDict):
+        raise NotImplementedError
 
-    def get_objects(self, requestDict):
-        # objects = self.model.objects.filter(**kwargs)
-        # return objects
-        raise NotImplementedError('This method must always be implemented')
+    def get_objects_POST(self, requestDict):
+        raise NotImplementedError
 
-    def check_parameters(self, pdict):
-        return set(pdict.keys()) - set(self.query_parameters)
-
-    def get_data(self, context, **kwargs):
-        requestDict = kwargs[JSON_POST_ARGS] if JSON_POST_ARGS in kwargs else self.request.GET
-
-        print('----------->')
-        print(requestDict)
+    def get(self, request, *args, **kwargs):
+        requestDict = self.request.GET
 
         # sanity: fail if there are unwanted parameters
         unknownParams = self.check_parameters(requestDict)
         if unknownParams:
             return self.buildErrorResponse('Invalid query pararameter(s) {}'.format(unknownParams), HTTP_BAD_REQUEST_CODE)
 
-        # 2. execute query and make pagination
-        objects = self.get_objects(requestDict)
+        # execute query and make pagination
+        objects = self.get_objects_GET(requestDict)
         # try:
         #     objects = self.get_objects(kwargs)
         # except Exception as e:
@@ -106,24 +91,42 @@ class JSONResponseMixin(object):
                       'totalPages': paginator.num_pages
                       }
 
-        # 3. return serialized data
+        # return serialized data
         data = []
         for obj in pageObjects:
             data.append(self.serializer(obj).data)
-        return self.buildResponse(results={'data': data}, pagination=pagination)
+        return JsonResponse(self.buildResponse(results={'data': data}, pagination=pagination))
 # end
 
 
-class JSONResponseMixinDetails(JSONResponseMixin):
-    def get_data(self, context):
+class JSONURLResponseMixinDetails(JSONResponseMixin):
+    def get(self, request, *args, **kwargs):
+        requestDict = kwargs
         try:
-            pkval = self.kwargs.get(self.pk)
+            pkval = requestDict.get(self.pk)
             obj = self.model.objects.get(pk=pkval)
         except self.model.DoesNotExist:
             return self.buildErrorResponse('Invalid object ID', 404)
 
         serializer = self.serializer(obj)
-        return self.buildResponse(results=serializer.data)
+        return JsonResponse(self.buildResponse(results=serializer.data))
+
+
+# class JSONResponseMixinDetails(JSONResponseMixin):
+#     def get(self, request, *args, **kwargs):
+#         requestDict = request.GET
+#         print(requestDict)
+#         print(args)
+#         print(kwargs)
+#         input()
+#         try:
+#             pkval = requestDict.get(self.pk)
+#             obj = self.model.objects.get(pk=pkval)
+#         except self.model.DoesNotExist:
+#             return self.buildErrorResponse('Invalid object ID', 404)
+#
+#         serializer = self.serializer(obj)
+#         return JsonResponse(self.buildResponse(results=serializer.data))
 
 
 class JSONPOSTResponseMixin(JSONResponseMixin):
@@ -142,7 +145,7 @@ class JSONPOSTResponseMixin(JSONResponseMixin):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class UnsafeTemplateView(TemplateView):
+class UnsafeTemplateView(View):
     pass
 
 
@@ -154,7 +157,7 @@ class Index(TemplateView):
         return HttpResponse("BRAPI API")
 
 
-class GermplasmDetails(JSONResponseMixinDetails, UnsafeTemplateView):
+class GermplasmDetails(JSONURLResponseMixinDetails, UnsafeTemplateView):
     model = models.Germplasm
     serializer = serializers.GermplasmDetailsSerializer
     pk = 'germplasmDbId'
@@ -163,8 +166,11 @@ class GermplasmDetails(JSONResponseMixinDetails, UnsafeTemplateView):
 class GermplasmSearch(JSONPOSTResponseMixin, UnsafeTemplateView):
     model = models.Germplasm
     serializer = serializers.GermplasmDetailsSerializer
-    query_parameters = ['germplasmName', 'germplasmDbId', 'germplasmPUI']
+    get_parameters = ['germplasmName', 'germplasmDbId', 'germplasmPUI']
     post_json_parameters = ['germplasmPUIs', 'germplasmDbIds', 'germplasmSpecies', 'germplasmGenus', 'germplasmNames', 'accessionNumbers']
+
+    # TODO get_POST_objects, get_GET_objects
+
 
     def get_objects(self, requestDict):
         objects = self.model.objects.all()
@@ -184,7 +190,7 @@ class GermplasmSearch(JSONPOSTResponseMixin, UnsafeTemplateView):
 class ProgramList(JSONResponseMixin, TemplateView):
     model = models.Program
     serializer = serializers.ProgramSerializer
-    query_parameters = ['programName', 'abbreviation']
+    get_parameters = ['programName', 'abbreviation']
 
     def get_objects(self, requestDict):
         objects = self.model.objects.all()
@@ -204,7 +210,7 @@ class TrialDetails(JSONResponseMixinDetails, TemplateView):
 class TrialList(JSONResponseMixin, TemplateView):
     model = models.Trial
     serializer = serializers.TrialDetailsSerializer
-    query_parameters = ['programDbId', 'locationDbId', 'active', ]
+    get_parameters = ['programDbId', 'locationDbId', 'active', ]
 
     def get_objects(self, kwargs):
         if 'locationDbId' in kwargs:
