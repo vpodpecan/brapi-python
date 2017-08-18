@@ -9,14 +9,17 @@
 {% endblock %}
 
 {% block content %}
+
 {% if confirm_form %}
-  <form action="{% url opts|admin_urlname:"process_import" %}" method="POST">
-    {% csrf_token %}
-    {% bootstrap_form confirm_form %}
-    <div class="submit-row">
-        <button type="submit" class="btn btn-success" name="confirm" value=>{% trans "Confirm import" %}</button>
-    </div>
-  </form>
+  {% if result and result.rows|length %}
+      <form action="{% url opts|admin_urlname:"process_import" %}" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form confirm_form %}
+        <div class="submit-row">
+            <button type="submit" class="btn btn-success" name="confirm" value=>{% trans "Confirm import" %}</button>
+        </div>
+      </form>
+  {% endif %}
 
   {% else %}
       <form action="" method="post" enctype="multipart/form-data">
@@ -30,8 +33,10 @@
                 </div>
 
                 {% if 'id' in fields %}
+                <p>
                     <span class="label label-info">Note</span>
                     The leading <strong>id</strong> field may be omitted if not present in original database schema (it was automatically added by the system).
+                </p>
                 {% endif %}
             </div>
           </div>
@@ -42,7 +47,7 @@
               <button type="submit" class="btn btn-default default" value="{% trans " Submit " %}">Submit</button>
           </div>
       </form>
-  {% endif %}
+{% endif %}
 
 
 {% if result %}
@@ -68,9 +73,20 @@
     </ul>
   {% else %}
 
+
+  {% if not result.rows|length %}
+    <h1>Nothing to import</h1>
+    <p>
+        <span class="label label-info">Note</span>
+        There are no new rows or updated values in the imported file.
+    </p>
+
+  {% else %}
+
   <h2>
     {% trans "Preview" %}
   </h2>
+
   <div class="table-responsive">
   <table class="table table-condensed table-bordered table-striped">
     <thead>
@@ -103,6 +119,9 @@
     {% endfor %}
   </table>
   </div>
+
+  {% endif %}
+
   {% endif %}
 
   {% endif %}
