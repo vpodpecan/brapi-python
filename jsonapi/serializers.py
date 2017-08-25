@@ -81,11 +81,9 @@ class Trial_TrialContactSerializer(serializers.ModelSerializer):
         fields = ('contactDbId', 'name', 'instituteName', 'email', 'type', 'orcid')
 
 
-class TrialDetailsSerializer(serializers.ModelSerializer):
+class TrialSummarySerializer(serializers.ModelSerializer):
     studies = Trial_StudySerializer(source='study_set', many=True)
-    contacts = Trial_TrialContactSerializer(source='trialcontact_set', many=True)
     programName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='programDbId')
-    datasetAuthorship = serializers.SerializerMethodField()
     active = serializers.SerializerMethodField()
     additionalInfo = serializers.SerializerMethodField()
     trialName = serializers.SerializerMethodField()
@@ -95,12 +93,6 @@ class TrialDetailsSerializer(serializers.ModelSerializer):
 
     def get_active(self, obj):
         return str(obj.active).lower()
-
-    def get_datasetAuthorship(self, obj):
-        datasetAuthorship_fields = {}
-        datasetAuthorship_fields['datasetAuthorshipLicence'] = obj.datasetAuthorshipLicence
-        datasetAuthorship_fields['datasetAuthorshipDatasetPUI'] = obj.datasetAuthorshipDatasetPUI
-        return datasetAuthorship_fields
 
     def get_additionalInfo(self, obj):
         # documentation is unclear about this, so we will not create empty arrays for publications beforehand
@@ -124,3 +116,14 @@ class TrialDetailsSerializer(serializers.ModelSerializer):
         # fields = ('trialDbId', 'trialName', 'programDbId', 'programName', 'startDate',
         #           'endDate', 'active', 'studies', 'contacts', 'datasetAuthorship')
         exclude = ('cropDbId', 'datasetAuthorshipLicence', 'datasetAuthorshipDatasetPUI', 'name')  # we have to rename 'name' to 'trialName'...
+
+
+class TrialDetailsSerializer(TrialSummarySerializer):
+    contacts = Trial_TrialContactSerializer(source='trialcontact_set', many=True)
+    datasetAuthorship = serializers.SerializerMethodField()
+
+    def get_datasetAuthorship(self, obj):
+        datasetAuthorship_fields = {}
+        datasetAuthorship_fields['datasetAuthorshipLicence'] = obj.datasetAuthorshipLicence
+        datasetAuthorship_fields['datasetAuthorshipDatasetPUI'] = obj.datasetAuthorshipDatasetPUI
+        return datasetAuthorship_fields
