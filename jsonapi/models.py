@@ -204,8 +204,8 @@ class ObservationUnit(models.Model):
     germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
     observationUnitDbId = models.TextField(primary_key=True, verbose_name=' observationUnitDbId')
     name = models.TextField(verbose_name=' name')
-    observationUnitLevel = models.TextField(blank=True, verbose_name=' observationUnitLevel')
-    observationUnitLevels = models.TextField(blank=True, verbose_name=' observationUnitLevels')
+    observationLevel = models.TextField(blank=True, verbose_name=' observationUnitLevel')
+    observationLevels = models.TextField(blank=True, verbose_name=' observationUnitLevels')
     entryNumber = models.TextField(blank=True, verbose_name=' entryNumber')
     entryType = models.TextField(blank=True, verbose_name=' entryType')
     plotNumber = models.TextField(blank=True, verbose_name=' plotNumber')
@@ -219,7 +219,7 @@ class ObservationUnit(models.Model):
         return '{}: {}'.format(self.pk, self.name)
 
 
-class ObservationUnitTreatment(models.Model):
+class Treatment(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
     factor = models.TextField(verbose_name=' factor')
@@ -243,6 +243,7 @@ class ObservationVariable(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     ontologyDbId = models.ForeignKey('Ontology', verbose_name=' ontologyDbId')
     observationVariableDbId = models.TextField(primary_key=True, verbose_name=' observationVariableDbId')
+    observationVariableName = models.TextField(blank=True, verbose_name=' observationVariableName')
     traitDbId = models.ForeignKey('Trait', verbose_name=' traitDbId')
     methodDbId = models.ForeignKey('Method', verbose_name=' methodDbId')
     scaleDbId = models.ForeignKey('Scale', verbose_name=' scaleDbId')

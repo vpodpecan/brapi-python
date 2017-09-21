@@ -4,6 +4,24 @@ from jsonapi import models
 from jsonapi import utils
 
 
+def collect_additional_info(objectset):
+    data = {}
+    for x in objectset:
+        if x.key not in data:
+            data[x.key] = x.value
+        else:
+            # append or transform into a list and append
+            if isinstance(data[x.key], list):
+                data[x.key].append(x.value)
+            else:
+                data[x.key] = [data[x.key], x.value]
+    return data
+
+
+def bool2text(x):
+    return str(x).lower()
+
+
 class Germplasm_DonorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Donor
@@ -41,26 +59,9 @@ class ProgramSerializer(serializers.ModelSerializer):
         exclude = ('cropDbId',)
 
 
-class Trial_TrialAdditionalInfoSerializer(serializers.ModelSerializer):
-    additionalInfo = serializers.SerializerMethodField()
-
-    def get_additionalInfo(self, obj):
-        data = {}
-        data[obj.key] = obj.value
-        return data
-
-    class Meta:
-        model = models.TrialAdditionalInfo
-        fields = ('additionalInfo',)
-        # fields = '__all__'
-
-
 class Trial_StudySerializer(serializers.ModelSerializer):
     locationName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='locationDbId')
-    studyName = serializers.SerializerMethodField()
-
-    def get_studyName(self, obj):
-        return obj.name
+    studyName = serializers.CharField(source='name')
 
     class Meta:
         model = models.Study
@@ -86,28 +87,13 @@ class TrialSummarySerializer(serializers.ModelSerializer):
     programName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='programDbId')
     active = serializers.SerializerMethodField()
     additionalInfo = serializers.SerializerMethodField()
-    trialName = serializers.SerializerMethodField()
-
-    def get_trialName(self, obj):
-        return obj.name
+    trialName = serializers.CharField(source='name')
 
     def get_active(self, obj):
-        return str(obj.active).lower()
+        return bool2text(obj.active)
 
     def get_additionalInfo(self, obj):
-        # documentation is unclear about this, so we will not create empty arrays for publications beforehand
-        # i.e. 'publications' key will only appear if there is nonempty list of publications
-        data = {}
-        for x in obj.trialadditionalinfo_set.all():
-            if x.key not in data:
-                data[x.key] = x.value
-            else:
-                # append or transform into a list and append
-                if isinstance(data[x.key], list):
-                    data[x.key].append(x.value)
-                else:
-                    data[x.key] = [data[x.key], x.value]
-        return data
+        return collect_additional_info(obj.trialadditionalinfo_set.all())
 
     class Meta:
         model = models.Trial
@@ -127,3 +113,82 @@ class TrialDetailsSerializer(TrialSummarySerializer):
         datasetAuthorship_fields['datasetAuthorshipLicence'] = obj.datasetAuthorshipLicence
         datasetAuthorship_fields['datasetAuthorshipDatasetPUI'] = obj.datasetAuthorshipDatasetPUI
         return datasetAuthorship_fields
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    additionalInfo = serializers.SerializerMethodField()
+
+    def get_additionalInfo(self, obj):
+        return collect_additional_info(obj.locationadditionalinfo_set.all())
+
+    class Meta:
+        model = models.Location
+        safe = False
+        exclude = ['cropDbId', 'type']
+
+
+class StudyDetailsSerializer(serializers.ModelSerializer):
+    contacts = Trial_TrialContactSerializer(source='studycontact_set', many=True)  # can be reused from Trial
+    location = LocationSerializer(source='locationDbId', many=False)
+    studyDescription = serializers.CharField(source='description')
+    additionalInfo = serializers.SerializerMethodField()
+    lastUpdate = serializers.SerializerMethodField()
+    seasons = serializers.SerializerMethodField()
+    active = serializers.SerializerMethodField()
+
+    def get_seasons(self, obj):
+        seasons = []
+        for studyseason in obj.studyseason_set.all():
+            seasons.append(studyseason.seasonDbId.season)
+        return seasons
+
+    def get_active(self, obj):
+        return bool2text(obj.active)
+
+    def get_lastUpdate(self, obj):
+        lastUpdate_fields = {}
+        lastUpdate_fields['version'] = obj.lastUpdateVersion
+        lastUpdate_fields['timestamp'] = obj.lastUpdateTimestamp
+        return lastUpdate_fields
+
+    def get_additionalInfo(self, obj):
+        return collect_additional_info(obj.studyadditionalinfo_set.all())
+
+    class Meta:
+        model = models.Study
+        safe = False
+        exclude = ['lastUpdateVersion', 'lastUpdateTimestamp']
+
+
+class StudySummarySerializer(serializers.ModelSerializer):
+    trialName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='trialDbId')
+    # studyType = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name')
+    seasons = serializers.SerializerMethodField()
+    locationName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='locationDbId')
+    programDbId = serializers.SerializerMethodField()
+    programName = serializers.SerializerMethodField()
+    additionalInfo = serializers.SerializerMethodField()
+    active = serializers.SerializerMethodField()
+
+    def get_seasons(self, obj):
+        seasons = []
+        for studyseason in obj.studyseason_set.all():
+            seasons.append(studyseason.seasonDbId.season)
+        return seasons
+
+    def get_active(self, obj):
+        return bool2text(obj.active)
+
+    def get_programDbId(self, obj):
+        return obj.trialDbId.programDbId.programDbId
+
+    def get_programName(self, obj):
+        return obj.trialDbId.programDbId.name
+
+    def get_additionalInfo(self, obj):
+        return collect_additional_info(obj.studyadditionalinfo_set.all())
+
+    class Meta:
+        model = models.Study
+        safe = False
+        exclude = ['lastUpdateVersion', 'lastUpdateTimestamp', 'description']

@@ -89,7 +89,7 @@ for model_name, model in app.models.items():
         pks = ['cropDbId', 'germplasmDbId', 'attributeDbId']
     elif model == models.LocationAdditionalInfo:
         pks = ['cropDbId', 'locationDbId', 'key']
-    elif model == models.ObservationUnitTreatment:
+    elif model == models.Treatment:
         pks = ['cropDbId', 'observationUnitDbId']
     elif model == models.Pedigree:
         pks = ['cropDbId', 'germplasmDbId', 'parent1Id', 'parent2Id']

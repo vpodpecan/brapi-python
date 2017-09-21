@@ -79,6 +79,8 @@ class JSONResponseMixin(object):
         return self.buildResponse(results={'data': data}, pagination=pagination)
 
 
+# todo: za call search: prilagodi obvezni ordering in serializer (ce ga ni, uporabi json.dumps...)
+
 @method_decorator(csrf_exempt, name='dispatch')
 class UnsafeTemplateView(View):
     pass
@@ -242,31 +244,104 @@ class TrialList(GET_response, TemplateView):
         val = requestDict.get('sortBy')
         if val is not None:
             if val == 'trialName':
-                objects.order_by('name')
-            if val == 'programName':
-                objects.order_by('programDbId__name')
+                objects = objects.order_by('name')
+            elif val == 'programName':
+                objects = objects.order_by('programDbId__name')
             elif val == 'studyName':
-                objects.order_by('study__name')
+                objects = objects.order_by('study__name')
             elif val == 'locationName':
-                objects.order_by('study__locationDbId__name')
+                objects = objects.order_by('study__locationDbId__name')
             else:
                 try:
                     self.model._meta.get_field(val)
-                except FieldDoesNotExist:
+                    objects = objects.order_by(val)
+                except:
                     raise ValueError('Invalid value for "sortBy" parameter: {}'.format(val))
 
         val = requestDict.get('sortOrder')
         if val is not None:
             val = val.lower()
-            if val == 'asc':
-                objects = objects.asc()
-            elif val == 'desc':
-                objects = objects.desc()
+            if val == 'desc':
+                objects = objects.reverse()
+            elif val == 'asc':
+                pass  # by default
             else:
                 raise ValueError('Invalid value for "sortOrder" parameter: {}'.format(val))
 
         return objects
 
-#objects = self.model.objects.filter(**kwargs)
-#     studies = models.Study.objects.filter(locationDbId=locationDbId)
-#     trials = models.Trial.objects.filter()
+
+class StudyDetails(GET_detail_response, TemplateView):
+    model = models.Study
+    serializer = serializers.StudyDetailsSerializer
+    pk = 'studyDbId'
+
+
+class StudyList(GET_response, TemplateView):
+    model = models.Study
+    serializer = serializers.StudySummarySerializer
+    get_parameters = []
+
+    def get_objects_GET(self, requestDict):
+        return self.model.objects.all()
+
+
+class StudySearch(GET_response, POST_JSON_response, UnsafeTemplateView):
+    model = models.Study
+    serializer = serializers.StudySummarySerializer
+    get_parameters = ['studyType', 'programDbId', 'locationDbId', 'seasonDbId', 'germplasmDbIds',
+                      'observationVariableDbIds', 'active', 'sortBy', 'sortOrder']
+    post_json_parameters = ['studyType', 'studyNames', 'studyLocations', 'programNames',
+                            'germplasmDbIds', 'observationVariableDbIds', 'active', 'sortBy', 'sortOrder']
+
+    def get_objects_GET(self, requestDict):
+        # objects = self.model.objects.all()
+        qdict = {}
+        for param in self.get_parameters:
+            if param in requestDict:
+                qdict[param] = requestDict[param]
+        return self.model.objects.filter(**qdict).order_by()
+
+    def get_objects_POST(self, requestDict):
+        objects = self.model.objects.all()
+
+        val = requestDict.get('studyType')
+        if val is not None:
+            objects = objects.filter(studyType=val)
+
+        val = requestDict.get('studyNames')
+        if val is not None:
+            objects = objects.filter(name__in=val)
+
+        val = requestDict.get('studyLocations')
+        print (len(objects))
+        if val is not None:
+            objects = objects.filter(locationDbId__name__in=val)
+            print (len(objects))
+
+        #TODO AND na query parametre
+
+        # param2attr = {'germplasmPUIs': 'germplasmPUI',
+        #               'germplasmDbIds': 'germplasmDbId',
+        #               'germplasmSpecies': 'species',
+        #               'germplasmGenus': 'genus',
+        #               'germplasmNames': 'name',
+        #               'accessionNumbers': 'accessionNumber'}
+        # for p in param2attr:
+        #     if p in requestDict:
+        #         kw = '{}__in'.format(param2attr[p])
+        #         objects = objects.filter(**{kw: requestDict[p]})
+        return objects
+
+
+        # objects = self.model.objects.all()
+        # param2attr = {'germplasmPUIs': 'germplasmPUI',
+        #               'germplasmDbIds': 'germplasmDbId',
+        #               'germplasmSpecies': 'species',
+        #               'germplasmGenus': 'genus',
+        #               'germplasmNames': 'name',
+        #               'accessionNumbers': 'accessionNumber'}
+        # for p in param2attr:
+        #     if p in requestDict:
+        #         kw = '{}__in'.format(param2attr[p])
+        #         objects = objects.filter(**{kw: requestDict[p]})
