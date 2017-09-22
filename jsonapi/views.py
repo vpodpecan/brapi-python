@@ -1,5 +1,5 @@
 import json
-
+from ast import literal_eval
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
@@ -78,6 +78,18 @@ class JSONResponseMixin(object):
             data.append(self.serializer(obj).data)
         return self.buildResponse(results={'data': data}, pagination=pagination)
 
+    def sortOrder(self, requestDict, objects):
+        val = requestDict.get('sortOrder')
+        if val is not None:
+            val = val.lower()
+            if val == 'desc':
+                objects = objects.reverse()
+            elif val == 'asc':
+                pass  # by default
+            else:
+                raise ValueError('Invalid value for "sortOrder" parameter: {}'.format(val))
+        return objects
+
 
 # todo: za call search: prilagodi obvezni ordering in serializer (ce ga ni, uporabi json.dumps...)
 
@@ -140,7 +152,26 @@ class POST_JSON_response(JSONResponseMixin):
 
 
 class GET_URLPARAMS_response(JSONResponseMixin):
-    pass
+    def checkGETparameters(self, requestDict):
+        return set(requestDict.keys()) - set(self.get_parameters) - set(self.pagination_params)
+
+    def get(self, request, *args, **kwargs):
+        requestDict = self.request.GET
+
+        # sanity: fail if there are unwanted parameters
+        unknownParams = self.checkGETparameters(requestDict)
+        if unknownParams:
+            return JsonResponse(self.buildErrorResponse('Invalid query pararameter(s) {}'.format(unknownParams), HTTP_BAD_REQUEST_CODE))
+
+        # execute query and make pagination
+        objects = self.get_objects_GET(requestDict, **kwargs)
+        # try:
+        #     objects = self.get_objects_GET(requestDict, **kwargs)
+        # except Exception as e:
+        #     return JsonResponse(self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE))
+
+        response = self.prepareResponse(objects, requestDict)
+        return JsonResponse(response)
 
 
 class GET_detail_response(JSONResponseMixin):
@@ -177,15 +208,14 @@ class GermplasmSearch(GET_response, POST_JSON_response, UnsafeTemplateView):
     post_json_parameters = ['germplasmPUIs', 'germplasmDbIds', 'germplasmSpecies', 'germplasmGenus', 'germplasmNames', 'accessionNumbers']
 
     def get_objects_GET(self, requestDict):
-        # objects = self.model.objects.all()
         qdict = {}
         for param in self.get_parameters:
             if param in requestDict:
                 qdict[param] = requestDict[param]
-        return self.model.objects.filter(**qdict).order_by()
+        return self.model.objects.filter(Q(**qdict))
 
     def get_objects_POST(self, requestDict):
-        objects = self.model.objects.all()
+        qdict = {}
         param2attr = {'germplasmPUIs': 'germplasmPUI',
                       'germplasmDbIds': 'germplasmDbId',
                       'germplasmSpecies': 'species',
@@ -194,9 +224,8 @@ class GermplasmSearch(GET_response, POST_JSON_response, UnsafeTemplateView):
                       'accessionNumbers': 'accessionNumber'}
         for p in param2attr:
             if p in requestDict:
-                kw = '{}__in'.format(param2attr[p])
-                objects = objects.filter(**{kw: requestDict[p]})
-        return objects
+                qdict['{}__in'.format(param2attr[p])] = requestDict[p]
+        return self.model.objects.filter(Q(**qdict))
 
 
 class ProgramList(GET_response, TemplateView):
@@ -205,11 +234,13 @@ class ProgramList(GET_response, TemplateView):
     get_parameters = ['programName', 'abbreviation']
 
     def get_objects_GET(self, requestDict):
-        objects = self.model.objects.all()
+        query = Q()
         if 'programName' in requestDict:
-            objects = objects.filter(name=requestDict['programName'])
+            query &= Q(name=requestDict['programName'])
         if 'abbreviation' in requestDict:
-            objects = objects.filter(abbreviation=requestDict['abbreviation'])
+            query &= Q(abbreviation=requestDict['abbreviation'])
+
+        objects = self.model.objects.filter(query)
         return objects
 
 
@@ -224,13 +255,12 @@ class TrialList(GET_response, TemplateView):
     serializer = serializers.TrialSummarySerializer
     get_parameters = ['programDbId', 'locationDbId', 'active', 'sortBy', 'sortOrder']
 
-    #sort order : asc/desc
     def get_objects_GET(self, requestDict):
-        objects = self.model.objects.all()
+        query = Q()
 
         val = requestDict.get('programDbId')
         if val is not None:
-            objects = objects.filter(programDbId=val)
+            query &= Q(programDbId=val)
 
         val = requestDict.get('active')
         if val is not None:
@@ -238,7 +268,9 @@ class TrialList(GET_response, TemplateView):
             if val not in ['true', 'false']:
                 raise ValueError('Invalid value for "active" parameter: {}'.format(val))
             val = True if val == 'true' else False
-            objects = objects.filter(active=val)
+            query &= Q(active=val)
+
+        objects = self.model.objects.filter(query)
 
         # we have to handle most cases manually because the fields are renamed
         val = requestDict.get('sortBy')
@@ -258,17 +290,7 @@ class TrialList(GET_response, TemplateView):
                 except:
                     raise ValueError('Invalid value for "sortBy" parameter: {}'.format(val))
 
-        val = requestDict.get('sortOrder')
-        if val is not None:
-            val = val.lower()
-            if val == 'desc':
-                objects = objects.reverse()
-            elif val == 'asc':
-                pass  # by default
-            else:
-                raise ValueError('Invalid value for "sortOrder" parameter: {}'.format(val))
-
-        return objects
+        return self.sortOrder(requestDict, objects)
 
 
 class StudyDetails(GET_detail_response, TemplateView):
@@ -294,54 +316,136 @@ class StudySearch(GET_response, POST_JSON_response, UnsafeTemplateView):
     post_json_parameters = ['studyType', 'studyNames', 'studyLocations', 'programNames',
                             'germplasmDbIds', 'observationVariableDbIds', 'active', 'sortBy', 'sortOrder']
 
+    # this is actual ListStudySummaries
     def get_objects_GET(self, requestDict):
-        # objects = self.model.objects.all()
-        qdict = {}
-        for param in self.get_parameters:
-            if param in requestDict:
-                qdict[param] = requestDict[param]
-        return self.model.objects.filter(**qdict).order_by()
-
-    def get_objects_POST(self, requestDict):
-        objects = self.model.objects.all()
+        query = Q()
+        distinct = False
 
         val = requestDict.get('studyType')
         if val is not None:
-            objects = objects.filter(studyType=val)
+            query &= Q(studyType__name=val)
+
+        val = requestDict.get('programDbId')
+        if val is not None:
+            query &= Q(trialDbId__programDbId__pk=val)
+
+        val = requestDict.get('locationDbId')
+        if val is not None:
+            query &= Q(locationDbId__pk=val)
+
+        val = requestDict.get('seasonDbId')
+        if val is not None:
+            # the API doc is idiotic about this: seasonDbId can be either PK or year...
+            query &= (Q(studyseason__seasonDbId__pk=val) | Q(studyseason__seasonDbId__year=val))
+            distinct = True
+
+        val = requestDict.get('germplasmDbIds')
+        if val is not None:
+            # safely parse list of strings
+            try:
+                val = literal_eval(val)
+            except:
+                raise ValueError('Invalid value for "germplasmDbIds" parameter: {}'.format(val))
+            query &= Q(cropDbId__germplasm__pk__in=val)
+            distinct = True
+
+        val = requestDict.get('observationVariableDbIds')
+        if val is not None:
+            # safely parse list of strings
+            try:
+                val = literal_eval(val)
+            except:
+                raise ValueError('Invalid value for "observationVariableDbIds" parameter: {}'.format(val))
+            query &= Q(cropDbId__observationvariable__pk__in=val)
+            distinct = True
+
+        val = requestDict.get('active')
+        if val is not None:
+            val = val.lower()
+            if val not in ['true', 'false']:
+                raise ValueError('Invalid value for "active" parameter: {}'.format(val))
+            val = True if val == 'true' else False
+            query &= Q(active=val)
+
+        val = requestDict.get('sortBy')
+        orderAttr = None
+        if val is not None:
+            try:
+                self.model._meta.get_field(val)
+                orderAttr = val
+            except:
+                raise ValueError('Invalid value for "sortBy" parameter: {}'.format(val))
+
+        objects = self.model.objects.filter(query)
+        if distinct:
+            objects = objects.distinct()
+        if orderAttr:
+            objects = objects.order_by(orderAttr)
+
+        return self.sortOrder(requestDict, objects)
+
+    def get_objects_POST(self, requestDict):
+        query = Q()
+        distinct = False
+
+        val = requestDict.get('studyType')
+        if val is not None:
+            query &= Q(studyType=val)
 
         val = requestDict.get('studyNames')
         if val is not None:
-            objects = objects.filter(name__in=val)
+            query &= Q(name__in=val)
 
         val = requestDict.get('studyLocations')
-        print (len(objects))
         if val is not None:
-            objects = objects.filter(locationDbId__name__in=val)
-            print (len(objects))
+            query &= Q(locationDbId__name__in=val)
 
-        #TODO AND na query parametre
+        val = requestDict.get('programNames')
+        if val is not None:
+            query &= Q(trialDbId__programDbId__name__in=val)
 
-        # param2attr = {'germplasmPUIs': 'germplasmPUI',
-        #               'germplasmDbIds': 'germplasmDbId',
-        #               'germplasmSpecies': 'species',
-        #               'germplasmGenus': 'genus',
-        #               'germplasmNames': 'name',
-        #               'accessionNumbers': 'accessionNumber'}
-        # for p in param2attr:
-        #     if p in requestDict:
-        #         kw = '{}__in'.format(param2attr[p])
-        #         objects = objects.filter(**{kw: requestDict[p]})
-        return objects
+        val = requestDict.get('germplasmDbIds')
+        if val is not None:
+            query &= Q(cropDbId__germplasm__pk__in=val)
+            distinct = True
+
+        val = requestDict.get('observationVariableDbIds')
+        if val is not None:
+            query &= Q(cropDbId__observationvariable__pk__in=val)
+            distinct = True
+
+        val = requestDict.get('active')
+        if val is not None:
+            val = val.lower()
+            if val not in ['true', 'false']:
+                raise ValueError('Invalid value for "active" parameter: {}'.format(val))
+            val = True if val == 'true' else False
+            query &= Q(active=val)
+
+        val = requestDict.get('sortBy')
+        orderAttr = None
+        if val is not None:
+            try:
+                self.model._meta.get_field(val)
+                orderAttr = val
+            except:
+                raise ValueError('Invalid value for "sortBy" parameter: {}'.format(val))
+
+        objects = self.model.objects.filter(query)
+        if distinct:
+            objects = objects.distinct()
+        if orderAttr:
+            objects = objects.order_by(orderAttr)
+
+        return self.sortOrder(requestDict, objects)
 
 
-        # objects = self.model.objects.all()
-        # param2attr = {'germplasmPUIs': 'germplasmPUI',
-        #               'germplasmDbIds': 'germplasmDbId',
-        #               'germplasmSpecies': 'species',
-        #               'germplasmGenus': 'genus',
-        #               'germplasmNames': 'name',
-        #               'accessionNumbers': 'accessionNumber'}
-        # for p in param2attr:
-        #     if p in requestDict:
-        #         kw = '{}__in'.format(param2attr[p])
-        #         objects = objects.filter(**{kw: requestDict[p]})
+class ObservationVariable(GET_URLPARAMS_response, UnsafeTemplateView):
+    model = models.ObservationVariable
+    serializer = serializers.ObservationVariableSerializer
+    get_parameters = []
+
+    def get_objects_GET(self, requestDict, **kwargs):
+        study = models.Study.objects.get(studyDbId=kwargs.get('studyDbId'))
+        variables = study.cropDbId.observationvariable_set.all()
+        return variables

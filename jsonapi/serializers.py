@@ -192,3 +192,22 @@ class StudySummarySerializer(serializers.ModelSerializer):
         model = models.Study
         safe = False
         exclude = ['lastUpdateVersion', 'lastUpdateTimestamp', 'description']
+
+
+class ObservationVariableSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ObservationVariable
+        safe = False
+        fields = '__all__'
+
+
+
+
+    # cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    # ontologyDbId = models.ForeignKey('Ontology', verbose_name=' ontologyDbId')
+    # observationVariableDbId = models.TextField(primary_key=True, verbose_name=' observationVariableDbId')
+    # observationVariableName = models.TextField(blank=True, verbose_name=' observationVariableName')
+    # traitDbId = models.ForeignKey('Trait', verbose_name=' traitDbId')
+    # methodDbId = models.ForeignKey('Method', verbose_name=' methodDbId')
+    # scaleDbId = models.ForeignKey('Scale', verbose_name=' scaleDbId')

@@ -9,7 +9,8 @@ urlpatterns = [
     url(r'^programs$', views.ProgramList.as_view()),
     url(r'^trials/(?P<trialDbId>[^ /]+)$', views.TrialDetails.as_view()),
     url(r'^trials$', views.TrialList.as_view()),
-    url(r'^studies/(?P<studyDbId>[^ /]+)$', views.StudyDetails.as_view()),
     url(r'^studies$', views.StudyList.as_view()),
+    url(r'^studies/(?P<studyDbId>[^ /]+)$', views.StudyDetails.as_view()),
     url(r'^studies-search$', views.StudySearch.as_view()),
+    url(r'^studies/(?P<studyDbId>[^ /]+)/observationVariables$', views.ObservationVariable.as_view()),
 ]
