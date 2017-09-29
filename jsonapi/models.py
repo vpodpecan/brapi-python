@@ -255,6 +255,7 @@ class ObservationVariable(models.Model):
 class Ontology(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     ontologyDbId = models.TextField(primary_key=True, verbose_name=' ontologyDbId')
+    name = models.TextField(verbose_name=' name')
 
     def __str__(self):
         return '{}'.format(self.pk)
@@ -410,6 +411,7 @@ class TaxonXrefGermplasm(models.Model):
 class Trait(models.Model):
     cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
     traitDbId = models.TextField(primary_key=True, verbose_name=' traitDbId')
+    name = models.TextField(blank=True, verbose_name=' name')
 
     def __str__(self):
         return '{}'.format(self.pk)

@@ -30,9 +30,8 @@ class Germplasm_DonorSerializer(serializers.ModelSerializer):
 
 
 class GermplasmDetailsSerializer(serializers.ModelSerializer):
-    commonCropName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='commonName', source='cropDbId')
+    commonCropName = serializers.CharField(source='cropDbId.commonName')
     donors = Germplasm_DonorSerializer(many=True, source='donor_set')
-    # taxonIds = Germplasm_TaxonXrefGermplasmSerializer(many=True, source='taxonxrefgermplasm_set')
     taxonIds = serializers.SerializerMethodField()
     synonyms = serializers.SerializerMethodField()
 
@@ -60,7 +59,7 @@ class ProgramSerializer(serializers.ModelSerializer):
 
 
 class Trial_StudySerializer(serializers.ModelSerializer):
-    locationName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='locationDbId')
+    locationName = serializers.CharField(source='locationDbId.name')
     studyName = serializers.CharField(source='name')
 
     class Meta:
@@ -70,11 +69,11 @@ class Trial_StudySerializer(serializers.ModelSerializer):
 
 
 class Trial_TrialContactSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='contactDbId')
-    instituteName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='instituteName', source='contactDbId')
-    email = serializers.SlugRelatedField(many=False, read_only=True, slug_field='email', source='contactDbId')
-    type = serializers.SlugRelatedField(many=False, read_only=True, slug_field='type', source='contactDbId')
-    orcid = serializers.SlugRelatedField(many=False, read_only=True, slug_field='orcid', source='contactDbId')
+    name = serializers.CharField(source='contactDbId.name')
+    instituteName = serializers.CharField(source='contactDbId.instituteName')
+    email = serializers.CharField(source='contactDbId.email')
+    type = serializers.CharField(source='contactDbId.type')
+    orcid = serializers.CharField(source='contactDbId.orcid')
 
     class Meta:
         model = models.Contact
@@ -84,7 +83,7 @@ class Trial_TrialContactSerializer(serializers.ModelSerializer):
 
 class TrialSummarySerializer(serializers.ModelSerializer):
     studies = Trial_StudySerializer(source='study_set', many=True)
-    programName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='programDbId')
+    programName = serializers.CharField(source='programDbId.name')
     active = serializers.SerializerMethodField()
     additionalInfo = serializers.SerializerMethodField()
     trialName = serializers.CharField(source='name')
@@ -99,9 +98,7 @@ class TrialSummarySerializer(serializers.ModelSerializer):
         model = models.Trial
         safe = False
         # fields = '__all__'
-        # fields = ('trialDbId', 'trialName', 'programDbId', 'programName', 'startDate',
-        #           'endDate', 'active', 'studies', 'contacts', 'datasetAuthorship')
-        exclude = ('cropDbId', 'datasetAuthorshipLicence', 'datasetAuthorshipDatasetPUI', 'name')  # we have to rename 'name' to 'trialName'...
+        exclude = ('cropDbId', 'datasetAuthorshipLicence', 'datasetAuthorshipDatasetPUI', 'name')
 
 
 class TrialDetailsSerializer(TrialSummarySerializer):
@@ -161,12 +158,11 @@ class StudyDetailsSerializer(serializers.ModelSerializer):
 
 
 class StudySummarySerializer(serializers.ModelSerializer):
-    trialName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='trialDbId')
-    # studyType = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name')
+    trialName = serializers.CharField(source='trialDbId.name')
     seasons = serializers.SerializerMethodField()
-    locationName = serializers.SlugRelatedField(many=False, read_only=True, slug_field='name', source='locationDbId')
-    programDbId = serializers.SerializerMethodField()
-    programName = serializers.SerializerMethodField()
+    locationName = serializers.CharField(source='locationDbId.name')
+    programDbId = serializers.CharField(source='trialDbId.programDbId.programDbId')
+    programName = serializers.CharField(source='trialDbId.programDbId.name')
     additionalInfo = serializers.SerializerMethodField()
     active = serializers.SerializerMethodField()
 
@@ -179,12 +175,6 @@ class StudySummarySerializer(serializers.ModelSerializer):
     def get_active(self, obj):
         return bool2text(obj.active)
 
-    def get_programDbId(self, obj):
-        return obj.trialDbId.programDbId.programDbId
-
-    def get_programName(self, obj):
-        return obj.trialDbId.programDbId.name
-
     def get_additionalInfo(self, obj):
         return collect_additional_info(obj.studyadditionalinfo_set.all())
 
@@ -194,20 +184,68 @@ class StudySummarySerializer(serializers.ModelSerializer):
         exclude = ['lastUpdateVersion', 'lastUpdateTimestamp', 'description']
 
 
+class ObservationVariable_TraitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Trait
+        safe = False
+        exclude = ['cropDbId']
+
+
+class ObservationVariable_MethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Method
+        safe = False
+        exclude = ['cropDbId']
+
+
+class ObservationVariable_ScaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Scale
+        safe = False
+        exclude = ['cropDbId']
+
+
 class ObservationVariableSerializer(serializers.ModelSerializer):
+    trait = ObservationVariable_TraitSerializer(source='traitDbId')
+    method = ObservationVariable_MethodSerializer(source='methodDbId')
+    scale = ObservationVariable_ScaleSerializer(source='scaleDbId')
+    name = serializers.CharField(source='observationVariableName')
+    ontologyName = serializers.CharField(source='ontologyDbId.name')
+    synonyms = serializers.SerializerMethodField()
+    contextOfUse = serializers.SerializerMethodField()
+
+    def get_synonyms(self, obj):
+        return []  # not yet specified by BRAPI
+
+    def get_contextOfUse(self, obj):
+        return []  # not yet specified by BRAPI
 
     class Meta:
         model = models.ObservationVariable
         safe = False
-        fields = '__all__'
+        exclude = ['traitDbId']
 
 
+class Study_GermplasmSerializer(serializers.ModelSerializer):
+    # commonCropName = serializers.CharField(source='cropDbId.commonName')
+    # donors = Germplasm_DonorSerializer(many=True, source='donor_set')
+    # taxonIds = serializers.SerializerMethodField()
+    synonyms = serializers.SerializerMethodField()
 
+    # def get_taxonIds(self, obj):
+    #     data = []
+    #     for txr in obj.taxonxrefgermplasm_set.all():
+    #         data.append({txr.taxonDbId.source: txr.taxonDbId.taxonDbId})
+    #     return data
 
-    # cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    # ontologyDbId = models.ForeignKey('Ontology', verbose_name=' ontologyDbId')
-    # observationVariableDbId = models.TextField(primary_key=True, verbose_name=' observationVariableDbId')
-    # observationVariableName = models.TextField(blank=True, verbose_name=' observationVariableName')
-    # traitDbId = models.ForeignKey('Trait', verbose_name=' traitDbId')
-    # methodDbId = models.ForeignKey('Method', verbose_name=' methodDbId')
-    # scaleDbId = models.ForeignKey('Scale', verbose_name=' scaleDbId')
+    def get_synonyms(self, obj):
+        return utils.valueArrayFromString(obj.synonyms)
+
+    class Meta:
+        model = models.Germplasm
+        safe = False
+        # some of the fields are not yet defined by BRAPI!
+        # fields = ['germplasmDbId', "entryNumber", "germplasmName", "pedigree", "seedSource", "accessionNumber",
+        #           "germplasmPUI", "synonyms"]
+        fields = ['germplasmDbId', "germplasmName", "pedigree", "seedSource", "accessionNumber",
+                  "germplasmPUI", "synonyms"]

@@ -288,12 +288,14 @@ CREATE TABLE observation_unit_xref (
 CREATE TABLE ontology (
   cropDbId text REFERENCES crop(cropDbId),
   ontologyDbId text NOT NULL PRIMARY KEY
+  name text NOT NULL
 );
 
 -- TODO: add detailed fields
 CREATE TABLE trait (
   cropDbId text REFERENCES crop(cropDbId),
   traitDbId text NOT NULL PRIMARY KEY
+  name text
 );
 
 -- TODO: add detailed fields

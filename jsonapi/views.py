@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, View
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.core.exceptions import FieldDoesNotExist
+from django_extensions.management.commands import show_urls
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
@@ -56,7 +57,7 @@ class JSONResponseMixin(object):
             return self.buildErrorResponse('Invalid page or pageSize parameter', HTTP_BAD_REQUEST_CODE)
 
         # order is mandatory because of pagination
-        if not objects.ordered:
+        if self.model and not objects.ordered:
             objects = objects.order_by('pk')
 
         paginator = Paginator(objects, pagesize)
@@ -75,7 +76,10 @@ class JSONResponseMixin(object):
         # return serialized data
         data = []
         for obj in pageObjects:
-            data.append(self.serializer(obj).data)
+            if self.serializer:
+                data.append(self.serializer(obj).data)
+            else:
+                data.append(obj)
         return self.buildResponse(results={'data': data}, pagination=pagination)
 
     def sortOrder(self, requestDict, objects):
@@ -118,10 +122,11 @@ class GET_response(JSONResponseMixin):
             return JsonResponse(self.buildErrorResponse('Invalid query pararameter(s) {}'.format(unknownParams), HTTP_BAD_REQUEST_CODE))
 
         # execute query and make pagination
-        try:
-            objects = self.get_objects_GET(requestDict)
-        except Exception as e:
-            return JsonResponse(self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE))
+        objects = self.get_objects_GET(requestDict)
+        # try:
+        #     objects = self.get_objects_GET(requestDict)
+        # except Exception as e:
+        #     return JsonResponse(self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE))
 
         response = self.prepareResponse(objects, requestDict)
         return JsonResponse(response)
@@ -164,11 +169,10 @@ class GET_URLPARAMS_response(JSONResponseMixin):
             return JsonResponse(self.buildErrorResponse('Invalid query pararameter(s) {}'.format(unknownParams), HTTP_BAD_REQUEST_CODE))
 
         # execute query and make pagination
-        objects = self.get_objects_GET(requestDict, **kwargs)
-        # try:
-        #     objects = self.get_objects_GET(requestDict, **kwargs)
-        # except Exception as e:
-        #     return JsonResponse(self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE))
+        try:
+            objects = self.get_objects_GET(requestDict, **kwargs)
+        except Exception as e:
+            return JsonResponse(self.buildErrorResponse('Data error: {}'.format(str(e)), HTTP_BAD_REQUEST_CODE))
 
         response = self.prepareResponse(objects, requestDict)
         return JsonResponse(response)
@@ -188,11 +192,47 @@ class GET_detail_response(JSONResponseMixin):
 
 
 class Index(TemplateView):
+    template_name = 'root.html'
     def get(self, request):
-        return self.post(request)
+        return render(request, self.template_name)
 
     def post(self, request):
-        return HttpResponse("BRAPI API")
+        return self.get(request)
+
+
+class CallSearch(GET_response, UnsafeTemplateView):
+    model = None
+    serializer = None
+    get_parameters = ['datatype']
+
+    def get_objects_GET(self, requestDict):
+        datatype = requestDict.get('datatype')
+
+        tmp = [x.split('\t') for x in show_urls.Command().handle(format_style='dense', urlconf='ROOT_URLCONF', no_color=True).split('\n')]
+        urls = []
+        for entry in tmp:
+            if len(entry) < 2:
+                continue
+            url = entry[0]
+            viewclass = entry[1].split('.')[-1]
+            if url.startswith('/brapi/v1/'):
+                url = url.replace('/brapi/v1/', '').replace('<', '{').replace('>', '}')
+                if url:
+                    urls.append((url, globals()[viewclass]))
+        result = []
+        for url, klas in urls:
+            data = {}
+            data['call'] = url
+            data['datatypes'] = ['json']
+            data['methods'] = []
+            if issubclass(klas, GET_response) or issubclass(klas, GET_URLPARAMS_response) or issubclass(klas, GET_detail_response):
+                data['methods'].append('GET')
+            if issubclass(klas, POST_JSON_response):
+                data['methods'].append('POST')
+
+            if datatype is None or datatype in data['datatypes']:
+                result.append(data)
+        return result
 
 
 class GermplasmDetails(GET_detail_response, UnsafeTemplateView):
@@ -440,7 +480,7 @@ class StudySearch(GET_response, POST_JSON_response, UnsafeTemplateView):
         return self.sortOrder(requestDict, objects)
 
 
-class ObservationVariable(GET_URLPARAMS_response, UnsafeTemplateView):
+class StudyObservationVariable(GET_URLPARAMS_response, UnsafeTemplateView):
     model = models.ObservationVariable
     serializer = serializers.ObservationVariableSerializer
     get_parameters = []
@@ -449,3 +489,13 @@ class ObservationVariable(GET_URLPARAMS_response, UnsafeTemplateView):
         study = models.Study.objects.get(studyDbId=kwargs.get('studyDbId'))
         variables = study.cropDbId.observationvariable_set.all()
         return variables
+
+
+class StudyGermplasm(GET_URLPARAMS_response, UnsafeTemplateView):
+    model = models.Germplasm
+    serializer = serializers.Study_GermplasmSerializer
+    get_parameters = []
+
+    def get_objects_GET(self, requestDict, **kwargs):
+        study = models.Study.objects.get(studyDbId=kwargs.get('studyDbId'))
+        return study.cropDbId.germplasm_set.all()

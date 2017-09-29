@@ -67,3 +67,17 @@ curl -H "Content-Type: application/json" -X POST "$BASEURL"/brapi/v1/studies-sea
      "sortOrder": "desc"
   	}' \
     | python3 -m json.tool > studies3.json
+
+# GET Study Observation Variables
+curl "$BASEURL"/brapi/v1/studies/1002/observationVariables \
+    | python3 -m json.tool > observationVariable1.json
+
+
+# GET Study Germplasms
+curl "$BASEURL"/brapi/v1/studies/1002/germplasm \
+    | python3 -m json.tool > observationVariable3.json
+
+
+# GET Call search
+curl "$BASEURL"/brapi/v1/calls?datatype=json \
+    | python3 -m json.tool > calls1.json
