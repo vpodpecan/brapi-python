@@ -16,7 +16,7 @@ atlassian-ide-plugin.xml
 
 #*.sqlite3
 
-media_root/*
-static_root/*
+#media_root/*
+#static_root/*
 
 docs/*
