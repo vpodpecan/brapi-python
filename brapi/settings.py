@@ -91,13 +91,7 @@ WSGI_APPLICATION = 'brapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'databases', 'db.sqlite3'),
-        # 'NAME': os.path.join(BASE_DIR, 'docs/BrAPI-Dataset/brapischema.sqlite3'),
-    }
-}
+# you have to create or edit local_settings.py!
 
 
 # Password validation
@@ -155,3 +149,9 @@ MEDIA_URL = '/media/'
 BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+try:
+    from local_settings import *
+except:
+    pass
+    #print('WARNING: please copy __local_settings.py into local_settings.py and configure!')

@@ -8,7 +8,6 @@ def deploy():
     with cd(project_dir), virtualenv():
         run('git pull origin master')
         run('cp --no-clobber conf/nginx.conf.sample conf/nginx.conf')
-        run('cp --no-clobber conf/supervisor.conf.sample conf/supervisor.conf')
         run('pip install -r requirements.txt')
         run('python manage.py migrate')
         run('python manage.py collectstatic --noinput')

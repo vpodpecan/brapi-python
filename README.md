@@ -17,8 +17,10 @@ e.g. germplasm -> typeOfGermplasmStorageCode is text, API wants array of strings
 3. `Python 3.5+`
 4. python packages listed in `requirements.txt`
 
+The following steps are to be performed only at the first installation. All subsequent updates of the project code are deployed using `fabric` (see below).
 
-#### Database
+
+#### Database configuration
 
 1. Create a user in Postgres named e.g., `django` and pick a password
     ```sql
@@ -34,19 +36,38 @@ e.g. germplasm -> typeOfGermplasmStorageCode is text, API wants array of strings
     ALTER ROLE django SET client_encoding TO 'utf8';
     ```
 
-#### Project source
+#### Project configuration
 
-1. Clone the project to some folder, e.g., `/srv/django-projects/brapi` and set permissions. We assume that `nginx` belongs to the `nobody` user group and `nobody` user account and that we are logged in as user `someuser`
+1. Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. We assume that `nginx` belongs to the `nobody` user group and `nobody` user account and that we are logged in as user `someuser`
 ```sh
 sudo mkdir /srv/django-projects
 sudo chown -R someuser:nobody /srv/django-projects
 sudo chmod -R 2750 /srv/django-projects
 git clone git@bitbucket.org:vpodpecan/brapi.git django-projects/brapi
 sudo chown -R nobody /srv/django-projects/brapi/media_root
+python3 -m venv django-projects/brapi/brapi-venv
+source django-projects/brapi/brapi-venv/bin/activate
+pip install -r django-projects/brapi/requirements.txt
+python manage.py collectstatic
+```
+
+#### Web server
+
+1. Link the `nginx.conf` project file into your system's nginx folder, e.g. `/etc/nginx/conf.d` where it will be automatically loaded when nginx starts.
+```sh
+cd /etc/nginx/conf.d
+sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
+```
+
+2. Copy `/srv/django-projects/brapi/conf/nginx.conf.sample` and edit according to your settings. In general, you will only need to modify server name and directory names.
+```
+cd /srv/django-projects/brapi/conf
+cp nginx.conf.sample nginx.conf
+nano nginx.conf
 ```
 
 
-
+gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config /srv/django-projects/brapi/conf/gunicorn.conf.py
 
 
 

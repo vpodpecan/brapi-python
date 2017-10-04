@@ -19,4 +19,5 @@ atlassian-ide-plugin.xml
 #media_root/*
 #static_root/*
 
+brapi/local_settings.py
 docs/*
