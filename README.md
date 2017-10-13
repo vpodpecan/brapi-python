@@ -40,31 +40,65 @@ The following steps are to be performed only at the first installation. All subs
 
 1. Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. We assume that `nginx` belongs to the `nobody` user group and `nobody` user account and that we are logged in as user `someuser`
 ```sh
-sudo mkdir /srv/django-projects
-sudo chown -R someuser:nobody /srv/django-projects
-sudo chmod -R 2750 /srv/django-projects
+cd /srv
+sudo mkdir django-projects
+sudo chown -R someuser:nobody django-projects
+sudo chmod -R 2750 django-projects
 git clone git@bitbucket.org:vpodpecan/brapi.git django-projects/brapi
-sudo chown -R nobody /srv/django-projects/brapi/media_root
-python3 -m venv django-projects/brapi/brapi-venv
-source django-projects/brapi/brapi-venv/bin/activate
-pip install -r django-projects/brapi/requirements.txt
+cd django-projects/brapi
+sudo chown -R nobody media_root
+python3 -m venv brapi-venv
+source brapi-venv/bin/activate
+pip install -r requirements.txt
 python manage.py collectstatic
 ```
 
 #### Web server
 
-1. Link the `nginx.conf` project file into your system's nginx folder, e.g. `/etc/nginx/conf.d` where it will be automatically loaded when nginx starts.
+1.  Copy `/srv/django-projects/brapi/conf/nginx.conf.sample` and edit according to your settings. In general, you will only need to modify server name and directory names.
+```sh
+cd /srv/django-projects/brapi/conf
+cp nginx.conf.sample nginx.conf
+nano nginx.conf
+```
+
+2. Link the configured `nginx.conf` project file into your system's nginx folder, e.g. `/etc/nginx/conf.d` where it will be automatically loaded when nginx starts.
 ```sh
 cd /etc/nginx/conf.d
 sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
 ```
 
-2. Copy `/srv/django-projects/brapi/conf/nginx.conf.sample` and edit according to your settings. In general, you will only need to modify server name and directory names.
+#### Application server
+
+First, ensure that nginx is up and running your edited `nginx.conf` file from the previous step. Please note that the command may differ from one Linux distribution to another.
+
+For Slackware Linux, the command is:
+```sh
+sudo /etc/rc.d/rc.nginx restart
 ```
-cd /srv/django-projects/brapi/conf
-cp nginx.conf.sample nginx.conf
-nano nginx.conf
+For Ubuntu 16 or newer the command is:
+```sh
+sudo systemctl restart nginx
 ```
+On older Ubuntu systems this should work:
+```sh
+sudo /etc/init.d/nginx restart
+```
+
+Your `nginx.conf` contains a line which tells which port is used for proxy. For example:
+```
+proxy_pass http://localhost:8002;
+```
+configures nginx to forward the traffic to port 8002 where our application server (Gunicorn) is running.
+
+To test whether everything is set up correctly run Gunicorn from the command line:
+```sh
+cd /srv/django-projects/brapi
+source brapi-venv/bin/activate
+gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config /srv/django-projects/brapi/conf/gunicorn.conf.py
+```
+
+To start the gunicorn server from command line
 
 
 gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config /srv/django-projects/brapi/conf/gunicorn.conf.py
