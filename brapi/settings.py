@@ -151,7 +151,6 @@ BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 CORS_ORIGIN_ALLOW_ALL = True
 
 try:
-    from local_settings import *
+    from .local_settings import *
 except:
     pass
-    #print('WARNING: please copy __local_settings.py into local_settings.py and configure!')

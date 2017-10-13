@@ -70,42 +70,64 @@ sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
 
 #### Application server
 
-First, ensure that nginx is up and running your edited `nginx.conf` file from the previous step. Please note that the command may differ from one Linux distribution to another.
+1.  First, ensure that nginx is up and running your edited `nginx.conf` file from the previous step. Please note that the command may differ from one Linux distribution to another.
 
-For Slackware Linux, the command is:
-```sh
-sudo /etc/rc.d/rc.nginx restart
-```
-For Ubuntu 16 or newer the command is:
-```sh
-sudo systemctl restart nginx
-```
-On older Ubuntu systems this should work:
-```sh
-sudo /etc/init.d/nginx restart
-```
+    For Slackware Linux, the command is:
+    ```sh
+    sudo /etc/rc.d/rc.nginx restart
+    ```
+    For Ubuntu 16 or newer the command is:
+    ```sh
+    sudo systemctl restart nginx
+    ```
+    On older Ubuntu systems this should work:
+    ```sh
+    sudo /etc/init.d/nginx restart
+    ```
 
-Your `nginx.conf` contains a line which tells which port is used for proxy. For example:
-```
-proxy_pass http://localhost:8002;
-```
-configures nginx to forward the traffic to port 8002 where our application server (Gunicorn) is running.
+    Your `nginx.conf` contains a line which tells which port is used for proxy. For example:
+    ```
+    proxy_pass http://127.0.0.1:8002;
+    ```
+    configures nginx to forward the traffic to local port 8002 where our application server (Gunicorn) is running. Gunicorn configuration file `conf/gunicorn.conf.py` also contains a line like
+    ```python
+    bind = "127.0.0.1:8002"
+    ```
+    Obviously, those two configuration lines have to specify the same address and port (the address may differ if you intend to run web and application servers on different computers).
 
-To test whether everything is set up correctly run Gunicorn from the command line:
+2.  Prepare a 'local_settings.py' file with production specific settings (e.g. database connection and passwords):
+    ```sh
+    cd /srv/django-projects/brapi/brapi
+    cp __local_settings.py local_settings.py
+    nano local_settings.py
+    ```
+    Typically, you will have to provide values for variables `ENGINE`, `USER`, `NAME`, `PASSWORD`, `HOST`. Use the values specified in the *Database configuration* section.
+
+3.  Test whether everything is set up correctly by running Gunicorn from the command line:
+    ```sh
+    cd /srv/django-projects/brapi
+    source brapi-venv/bin/activate
+    gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config conf/gunicorn.conf.py
+    ```
+    The BRAPI link to list programs [/brapi/v1/programs](http://127.0.0.1/brapi/v1/programs) should return an JSON listing the first page of programs.
+
+    If you get a "502 bad gateway" error the likely cause is wrong file permissions or some other major error on the Django/Gunicorn. The traceback in the console or log of Gunicorn should give you a hint what went wrong.
+
+4.  Finally, you will probably want a monitor to supervise Gunicorn. See the [official Gunicorn documentation](http://docs.gunicorn.org/en/stable/deploy.html) for more details.
+    TODO!
+
+
+### How to update an existing installation
+
+TODO!
+Updating a working installation is easy. Only the following steps are required:
 ```sh
 cd /srv/django-projects/brapi
 source brapi-venv/bin/activate
-gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config /srv/django-projects/brapi/conf/gunicorn.conf.py
+sudo fab deploy
 ```
 
-To start the gunicorn server from command line
-
-
-gunicorn --env DJANGO_SETTINGS_MODULE=brapi.settings brapi.wsgi --config /srv/django-projects/brapi/conf/gunicorn.conf.py
-
-
-
-
+## THIS IS OBSOLETE
 
 
 
