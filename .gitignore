@@ -21,3 +21,9 @@ atlassian-ide-plugin.xml
 
 brapi/local_settings.py
 docs/*
+
+conf/nginx.conf
+conf/uwsgi.ini
+
+# uwsgi socket
+brapi.sock

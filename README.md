@@ -17,6 +17,8 @@ e.g. germplasm -> typeOfGermplasmStorageCode is text, API wants array of strings
 3. `Python 3.5+`
 4. python packages listed in `requirements.txt`
 
+Please consult the corresponding documentation about how to install these requirements on your system.
+
 The following steps are to be performed only at the first installation. All subsequent updates of the project code are deployed using `fabric` (see below).
 
 
@@ -38,8 +40,10 @@ The following steps are to be performed only at the first installation. All subs
 
 #### Project configuration
 
-1. Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. We assume that `nginx` belongs to the `nobody` user group and `nobody` user account and that we are logged in as user `someuser`
+1. Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. You will have to know the user and group the nginx server is using, e.g., `nobody:nobody` on Slackware Linux and on `www-data:www-data` on Ubuntu. We will assume `nobody:nobody` as the user and group and that we are logged in as user `someuser`. Please change these values according to your situation in the instructions below.
+
 ```sh
+# make folder, set permissions, download project sources
 cd /srv
 sudo mkdir django-projects
 sudo chown -R someuser:nobody django-projects
@@ -47,15 +51,19 @@ sudo chmod -R 2750 django-projects
 git clone git@bitbucket.org:vpodpecan/brapi.git django-projects/brapi
 cd django-projects/brapi
 sudo chown -R nobody media_root
+# install application server
+sudo pip install uwsgi
+# create and activate virtual environment
 python3 -m venv brapi-venv
 source brapi-venv/bin/activate
+# install all project requirements and gather static files
 pip install -r requirements.txt
 python manage.py collectstatic
 ```
 
 #### Web server
 
-1.  Copy `/srv/django-projects/brapi/conf/nginx.conf.sample` and edit according to your settings. In general, you will only need to modify server name and directory names.
+1.  Copy your `nginx.conf.sample` into `nginx.conf` and edit according to your settings. In general, you will only need to modify server name and directory names.
 ```sh
 cd /srv/django-projects/brapi/conf
 cp nginx.conf.sample nginx.conf
