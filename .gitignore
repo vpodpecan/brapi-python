@@ -25,5 +25,7 @@ docs/*
 conf/nginx.conf
 conf/uwsgi.ini
 
+databases/db.sqlite3
+
 # uwsgi socket
 brapi.sock

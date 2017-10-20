@@ -15,3 +15,4 @@ uwsgi==2.0.15
 fabric3==1.13.1.post1
 #gunicorn==19.7.1
 #gevent==1.2.2
+psycopg2==2.7.3.1

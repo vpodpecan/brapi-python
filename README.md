@@ -15,9 +15,10 @@ e.g. germplasm -> typeOfGermplasmStorageCode is text, API wants array of strings
 1. `Postgres`
 2. `Nginx`
 3. `Python 3.5+`
-4. python packages listed in `requirements.txt`
+4. `pip`
+5. python packages listed in `requirements.txt`
 
-Please consult the corresponding documentation about how to install these requirements on your system.
+Please consult the corresponding documentation about how to install these requirements on your system. Note that on Ubuntu systems you will have to install packages such as python3-dev, python-pip, etc.
 
 The following steps are to be performed only at the first installation. All subsequent updates of the project code are deployed using `fabric` (see below).
 
@@ -30,12 +31,14 @@ The following steps are to be performed only at the first installation. All subs
     ```
 2. Create a database called `brapi`
     ```sql
-    CREATE DATABASE django;
+    CREATE DATABASE brapi;
     ```
 3. Grant the user `django` all privileges and ensure `utf-8` encoding
     ```sql
     GRANT ALL PRIVILEGES ON DATABASE brapi TO django;
     ALTER ROLE django SET client_encoding TO 'utf8';
+    ALTER ROLE django SET default_transaction_isolation TO 'read committed';
+    ALTER ROLE django SET timezone TO 'UTC';
     ```
 
 #### Project configuration
@@ -78,6 +81,10 @@ sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
 
 #### Application server
 
+TODO!
+
+dodaj django-adminrestrict !
+
 1.  First, ensure that nginx is up and running your edited `nginx.conf` file from the previous step. Please note that the command may differ from one Linux distribution to another.
 
     For Slackware Linux, the command is:
@@ -110,6 +117,12 @@ sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
     nano local_settings.py
     ```
     Typically, you will have to provide values for variables `ENGINE`, `USER`, `NAME`, `PASSWORD`, `HOST`. Use the values specified in the *Database configuration* section.
+
+    You will also have to add your server name to the ALLOWED_HOSTS variable, e.g.
+    ```python
+    ALLOWED_HOSTS = ['brapi.mydomain.net']
+    ```
+    You may use `*` but in this case you are responsible to provide your own validation of the `Host` header.
 
 3.  Test whether everything is set up correctly by running Gunicorn from the command line:
     ```sh

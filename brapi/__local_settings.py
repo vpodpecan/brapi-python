@@ -1,5 +1,6 @@
 DEBUG = False
 
+# enter database details and credentials
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.?',
@@ -10,3 +11,6 @@ DATABASES = {
         'PORT': ''
     }
 }
+
+# fill in your domain (or '*' but this is not recommended)
+ALLOWED_HOSTS = []
