@@ -193,6 +193,7 @@ class GET_detail_response(JSONResponseMixin):
 
 class Index(TemplateView):
     template_name = 'root.html'
+    
     def get(self, request):
         return render(request, self.template_name)
 
