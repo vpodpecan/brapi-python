@@ -95,8 +95,6 @@ class JSONResponseMixin(object):
         return objects
 
 
-# todo: za call search: prilagodi obvezni ordering in serializer (ce ga ni, uporabi json.dumps...)
-
 @method_decorator(csrf_exempt, name='dispatch')
 class UnsafeTemplateView(View):
     pass
@@ -193,7 +191,7 @@ class GET_detail_response(JSONResponseMixin):
 
 class Index(TemplateView):
     template_name = 'root.html'
-    
+
     def get(self, request):
         return render(request, self.template_name)
 

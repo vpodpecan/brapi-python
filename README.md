@@ -253,3 +253,29 @@ ALTER ROLE django SET client_encoding TO 'utf8';
 ALTER ROLE django SET default_transaction_isolation TO 'read committed';
 ALTER ROLE django SET timezone TO 'UTC';
 ```
+
+
+
+### How to update Django BrAPI to a new BrAPI specification
+
+
+In general, only minor updates are expected, e.g., field renaming, type changes, add tables, etc. This means that very little work is required to update Django BrAPI to the new version.  
+
+The following steps should be followed:
+
+1.  Update Django BrAPI Models in `jsonapi/models.py`. Add new fields, rename, change type, add classes, etc.
+
+2.  Migrate your changes into the database:
+    ```sh
+    cd /srv/django-projects/brapi
+    source brapi-venv/bin/activate
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+3.  Update Django BrAPI serializers in `jsonapi/serializers.py`. Change name, add class, etc. You can reuse most of the code as the pattern is always the same.
+
+
+4.  Update Django BrAPI views in `jsonapi/views.py`. This is the most time consuming step. Typically, you will have to write a new class which will handle the request parameters and retrieve objects from the database. Again, the majority of the new code can be reused from other view classes which already implement all possible API call variants and options.
+
+5.  If required, update the `jsonapi/urls.py` by adding a new url pointing to a newly created view class.
