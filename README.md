@@ -29,15 +29,20 @@ The following steps are to be performed only at the first installation. All subs
 
 ### Database configuration
 
-1. Create a user in Postgres named e.g., `django` and pick a password:
+1. Launch `psql`
+    ```sh
+    sudo -u postgres psql
+    ```
+
+2. Create a database user named e.g., `django` and pick a password:
     ```sql
     CREATE USER django WITH PASSWORD 'password';
     ```
-2. Create a database called `brapi`:
+3. Create a database called `brapi`:
     ```sql
     CREATE DATABASE brapi;
     ```
-3. Grant the user `django` create db privileges and set ownership, ensure `utf-8` encoding and configure few other parameters:
+4. Grant the user `django` create db privileges and set ownership, ensure `utf-8` encoding and configure few other parameters:
     ```sql
     ALTER USER django CREATEDB;
     ALTER DATABASE brapi OWNER TO django;
