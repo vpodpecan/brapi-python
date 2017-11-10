@@ -10,7 +10,7 @@ This is a working but not yet complete implementation of BrAPI. As soon as the B
 
 ##### Author
 
-[Vid Podpečan](http://kt.ijs.si/vid_podpecan/) (vid.podpecan@ijs.si)   
+[Vid Podpečan](http://kt.ijs.si/vid_podpecan/) (vid.podpecan@ijs.si)  
 [Jožef Stefan Institute](http://kt.ijs.si/) & [National Institute of Biology](http://www.nib.si/eng/index.php/departments/department-of-biotechnology-and-systems-biology)
 
 
@@ -26,11 +26,11 @@ This manual describes the installation and configuration of the BrAPI Django app
 
 #### Requirements
 
-1. `Postgres`
-2. `Nginx`
-3. `Python 3.5+`
-4. `pip`
-5. `uWSGI`
+1.  `Postgres`
+2.  `Nginx`
+3.  `Python 3.5+`
+4.  `pip`
+5.  `uWSGI`
 6.  python packages listed in `requirements.txt`
 
 Please consult the corresponding documentation about how to install these requirements on your system. Note that on Ubuntu systems you will also have to install packages such as `python3-dev`, `python-pip`, etc. The described steps are to be performed only at the first installation. All subsequent updates of the project code are very simple as explained at the end of this manual.
@@ -60,20 +60,20 @@ python manage.py runserver
 
 #### Database configuration
 
-1. Launch `psql`
+1.  Launch `psql`
     ```sh
     sudo -u postgres psql
     ```
 
-2. Create a database user named e.g., `django` and pick a password:
+2.  Create a database user named e.g., `django` and pick a password:
     ```sql
     CREATE USER django WITH PASSWORD 'password';
     ```
-3. Create a database called `brapi`:
+3.  Create a database called `brapi`:
     ```sql
     CREATE DATABASE brapi;
     ```
-4. Grant the user `django` create db privileges and set ownership, ensure `utf-8` encoding and configure few other parameters:
+4.  Grant the user `django` create db privileges and set ownership, ensure `utf-8` encoding and configure few other parameters:
     ```sql
     ALTER USER django CREATEDB;
     ALTER DATABASE brapi OWNER TO django;
@@ -91,7 +91,7 @@ python manage.py runserver
     cd /srv
     sudo mkdir django-projects
     sudo chown -R someuser:www-data django-projects
-    git clone git@bitbucket.org:vpodpecan/brapi.git django-projects/brapi
+    git clone https://github.com/vpodpecan/brapi-python.git django-projects/brapi
     sudo chown -R someuser:www-data django-projects
     sudo chown -R www-data django-projects/brapi/media_root
 
@@ -215,3 +215,41 @@ Updating a working installation is easy. The following steps are required:
     ```
 
 3.  Restart uWSGI and nginx
+
+
+#### Database backup and restore
+
+##### Backup
+
+To create a backup of the whole `brapi` database you can use the `pg_dump` utility:
+```sh
+sudo -u postgres pg_dump --clean brapi | gzip > brapi-db-backup.gz
+```
+
+##### Restore
+
+To restore from a backup archive into a `brapi` database use `psql`:
+```sh
+sudo -u postgres gunzip -c filename.gz | psql brapi
+```
+
+After the restoration make sure that the `django user` owns the `brapi` database:
+```sh
+sudo -u postgres psql
+```
+```sql
+ALTER DATABASE brapi OWNER TO django;
+```
+
+###### Note
+When restoring from a backup archive into a clean new system, first make sure that the `django` user exists and has enough privileges:
+```sh
+sudo -u postgres psql
+```
+```sql
+CREATE USER django WITH PASSWORD 'password';
+ALTER USER django CREATEDB;
+ALTER ROLE django SET client_encoding TO 'utf8';
+ALTER ROLE django SET default_transaction_isolation TO 'read committed';
+ALTER ROLE django SET timezone TO 'UTC';
+```
