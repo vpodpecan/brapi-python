@@ -1,16 +1,27 @@
+## A Python+Django implementation of BrAPI
+
+##### About
+This project implements the Plantbreeding API using the Python language and the Django web framework.
+See [https://github.com/plantbreeding/API]((https://github.com/plantbreeding/API)) for more information about BrAPI.
+
+##### Status
+This is a working but not yet complete implementation of BrAPI. As soon as the BrAPI itself becomes stable and complete and a full test data set is made available the sources can be easily upgraded.
 
 
-### OPEN QUESTIONS
+##### Author
 
--   incompleteness and errors in current DB schema
--   inconsistencies between BRAPI API description and current schema
-e.g. germplasm -> typeOfGermplasmStorageCode is text, API wants array of strings
+[Vid Podpečan](http://kt.ijs.si/vid_podpecan/) (vid.podpecan@ijs.si)   
+[Jožef Stefan Institute](http://kt.ijs.si/) & [National Institute of Biology](http://www.nib.si/eng/index.php/departments/department-of-biotechnology-and-systems-biology)
 
-## How to install BrAPI Django application
 
-This manual describes the installation of the BrAPI Django application on a modern Linux system.
+##### License
 
-**Author**: Vid Podpečan (vid.podpecan@ijs.si)
+The code is licensed under the GPLv3 lincense.
+
+
+### How to set up Django BrAPI
+
+This manual describes the installation and configuration of the BrAPI Django application on a modern Linux system, e.g. Ubuntu 16.04.
 
 
 #### Requirements
@@ -19,15 +30,35 @@ This manual describes the installation of the BrAPI Django application on a mode
 2. `Nginx`
 3. `Python 3.5+`
 4. `pip`
-5. `uwsgi`
+5. `uWSGI`
 6.  python packages listed in `requirements.txt`
 
-Please consult the corresponding documentation about how to install these requirements on your system. Note that on Ubuntu systems you will also have to install packages such as `python3-dev`, `python-pip`, etc.
+Please consult the corresponding documentation about how to install these requirements on your system. Note that on Ubuntu systems you will also have to install packages such as `python3-dev`, `python-pip`, etc. The described steps are to be performed only at the first installation. All subsequent updates of the project code are very simple as explained at the end of this manual.
 
-The following steps are to be performed only at the first installation. All subsequent updates of the project code are very simple as explained in the end of this manual.
+##### Development installation
+If you only need a development installation of Django BrAPI, you can skip the installation of Postgres, Nginx and uWSGI. You will only have to modify your `local_settings.py` to use a SQLite database:
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'databases', 'db.sqlite3'),
+    }
+}
+```
+and install all Python packages (see the instructions below). Then, create the database, launch the development server and visit [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+```sh
+cd /srv/django-projects/brapi
+source brapi-venv/bin/activate
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
 
 
-### Database configuration
+
+
+#### Database configuration
 
 1. Launch `psql`
     ```sh
@@ -51,9 +82,9 @@ The following steps are to be performed only at the first installation. All subs
     ALTER ROLE django SET timezone TO 'UTC';
     ```
 
-### Project configuration
+#### Project configuration
 
-1.  Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. You will have to know the user and group the nginx server is using, e.g., `nobody:nobody` on Slackware Linux and `www-data:www-data` on Ubuntu. We will assume `www-data:www-data` as the user and group and that we are logged in as user `someuser` (*please change these values according to your situation in the instructions below*).
+1.  Clone the project to some folder, e.g., `/srv/django-projects/brapi`, set permissions and set up a virtual environment. You will have to know the user and group the Nginx server is using, e.g., `nobody:nobody` on Slackware Linux and `www-data:www-data` on Ubuntu. We will assume `www-data:www-data` as the user and group and that we are logged in as user `someuser` (*please change these values according to your situation in the instructions below*).
 
     ```sh
     # make folder, download project sources, set permissions
@@ -113,8 +144,7 @@ The following steps are to be performed only at the first installation. All subs
     python manage.py createsuperuser
     ```
 
-
-### Web server
+#### Web server
 
 1.  Copy your `nginx.conf.sample` into `nginx.conf` and edit according to your settings. In general, you will only need to modify the server name and directory names.
     ```sh
@@ -123,13 +153,13 @@ The following steps are to be performed only at the first installation. All subs
     nano nginx.conf
     ```
 
-2.  Link the configured `nginx.conf` project file into your system's nginx sites folder, e.g. `/etc/nginx/sites-enabled/` on Ubuntu (or `/etc/nginx/conf.d` on Slackware) where it will be automatically loaded when nginx starts.
+2.  Link the configured `nginx.conf` project file into your system's nginx sites folder, e.g. `/etc/nginx/sites-enabled/` on Ubuntu (or `/etc/nginx/conf.d` on Slackware) where it will be automatically loaded when Nginx starts.
     ```sh
     cd /etc/nginx/sites-enabled/
     sudo ln -s /srv/django-projects/brapi/conf/nginx.conf
     ```
 
-3.  Restart nginx by typing
+3.  Restart Nginx by typing
     ```sh
     sudo service nginx restart
     ```
@@ -138,12 +168,16 @@ The following steps are to be performed only at the first installation. All subs
     sudo /etc/rc.d/rc.nginx restart
     ```
     on Slackware Linux and test your configuration by visiting [http://localhost](http://localhost).
-    If you see the *502 Bad Gateway* page it means that nginx is working and you should proceed to the next step to configure the application server. The error message simply tells you that nginx forwarded the request which was then not handled by the application server.
+    If you see the *502 Bad Gateway* page it means that Nginx is working and you should proceed to the next step to configure the application server. The error message simply tells you that Nginx forwarded the request which was then not handled by the application server.
 
+4.  If you have an active firewall you may need to allow Nginx to communicate on ports 80 and 443. On Ubuntu systems use the following command:
+    ```sh
+    sudo ufw allow 'Nginx Full'
+    ```
 
-### Application server
+#### Application server
 
-We will use the `uWSGI` applicaton server to serve requests comming to our Django application from our `nginx` HTTP server.
+We will use the `uWSGI` applicaton server to serve the requests comming to our Django application from our Nginx HTTP server.
 
 1.  First, copy your `uwsgi.ini.sample` into `uwsgi.ini` and edit according to your settings. Note that if you are using the suggested directory and socket file locations there is no need to change the default configuration.
     ```sh
@@ -152,21 +186,18 @@ We will use the `uWSGI` applicaton server to serve requests comming to our Djang
     nano uwsgi.ini
     ```
 
-2.  Run the `uwsgi` server
+2.  Run the uWSGI server
     ```sh
     sudo uwsgi --ini /srv/django-projects/brapi/conf/uwsgi.ini --uid www-data --gid www-data
     ```
     and test the configuration by visiting [http://localhost/admin](http://localhost/admin)
 
-3.  If you want to start uwsgi at boot simply add the command to your `rc.local` script.
+3.  If you want to start uWSGI at boot simply add the command to your `rc.local` script.
 
     For a better integration with your system's services manager please consult the official uWSGI documentation: [https://uwsgi-docs.readthedocs.io/en/latest/](https://uwsgi-docs.readthedocs.io/en/latest/)
 
 
-
-dodaj django-adminrestrict !
-
-### How to update an existing installation
+#### How to update an existing installation
 
 Updating a working installation is easy. The following steps are required:
 
