@@ -38,6 +38,8 @@ Please consult the corresponding documentation about how to install these requir
 ##### Development installation
 If you only need a development installation of Django BrAPI, you can skip the installation of Postgres, Nginx and uWSGI. You will only have to modify your `local_settings.py` to use a SQLite database:
 ```python
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
