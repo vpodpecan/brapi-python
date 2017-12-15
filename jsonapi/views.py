@@ -350,7 +350,7 @@ class StudyList(GET_response, TemplateView):
 class StudySearch(GET_response, POST_JSON_response, UnsafeTemplateView):
     model = models.Study
     serializer = serializers.StudySummarySerializer
-    get_parameters = ['studyType', 'programDbId', 'locationDbId', 'seasonDbId', 'germplasmDbIds',
+    get_parameters = ['trialDbId', 'studyType', 'programDbId', 'locationDbId', 'seasonDbId', 'germplasmDbIds',
                       'observationVariableDbIds', 'active', 'sortBy', 'sortOrder']
     post_json_parameters = ['studyType', 'studyNames', 'studyLocations', 'programNames',
                             'germplasmDbIds', 'observationVariableDbIds', 'active', 'sortBy', 'sortOrder']
@@ -359,6 +359,10 @@ class StudySearch(GET_response, POST_JSON_response, UnsafeTemplateView):
     def get_objects_GET(self, requestDict):
         query = Q()
         distinct = False
+
+        val = requestDict.get('trialDbId')
+        if val is not None:
+            query &= Q(trialDbId__pk=val)
 
         val = requestDict.get('studyType')
         if val is not None:
