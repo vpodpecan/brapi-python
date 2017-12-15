@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^studies-search$', views.StudySearch.as_view()),
     url(r'^studies/(?P<studyDbId>[^ /]+)/observationVariables$', views.StudyObservationVariable.as_view()),
     url(r'^studies/(?P<studyDbId>[^ /]+)/germplasm$', views.StudyGermplasm.as_view()),
-    url(r'^locations$', views.LocationList.as_view())
+    url(r'^locations$', views.LocationList.as_view()),
+    url(r'^locations/(?P<locationDbId>[^ /]+)$', views.LocationDetails.as_view())
 ]

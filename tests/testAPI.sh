@@ -84,6 +84,11 @@ curl -G "$BASEURL"/brapi/v1/locations \
     | python3 -m json.tool > locations1.json
 
 
+# GET Location details
+curl "$BASEURL"/brapi/v1/locations/10 \
+    | python3 -m json.tool > locations2.json
+
+
 # GET Call search
 curl "$BASEURL"/brapi/v1/calls?datatype=json \
     | python3 -m json.tool > calls1.json

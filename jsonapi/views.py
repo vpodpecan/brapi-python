@@ -500,7 +500,7 @@ class StudyGermplasm(GET_URLPARAMS_response, UnsafeTemplateView):
         return study.cropDbId.germplasm_set.all()
 
 
-class LocationList(GET_response, TemplateView):
+class LocationList(GET_response, UnsafeTemplateView):
     model = models.Location
     serializer = serializers.LocationSerializer
     get_parameters = ['locationType']
@@ -512,3 +512,9 @@ class LocationList(GET_response, TemplateView):
 
         objects = self.model.objects.filter(query)
         return objects
+
+
+class LocationDetails(GET_detail_response, UnsafeTemplateView):
+    model = models.Location
+    serializer = serializers.LocationSerializer
+    pk = 'locationDbId'

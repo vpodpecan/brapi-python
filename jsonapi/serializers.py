@@ -261,5 +261,4 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Location
         safe = False
-        # fields = []
         exclude = ['cropDbId']

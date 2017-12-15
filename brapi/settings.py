@@ -150,7 +150,4 @@ BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-try:
-    from .local_settings import *
-except:
-    pass
+from .local_settings import *
