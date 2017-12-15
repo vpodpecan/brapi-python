@@ -78,6 +78,12 @@ curl "$BASEURL"/brapi/v1/studies/1002/germplasm \
     | python3 -m json.tool > observationVariable3.json
 
 
+# GET List Locations
+curl -G "$BASEURL"/brapi/v1/locations \
+    --data-urlencode "locationType=Farmer field location" \
+    | python3 -m json.tool > locations1.json
+
+
 # GET Call search
 curl "$BASEURL"/brapi/v1/calls?datatype=json \
     | python3 -m json.tool > calls1.json

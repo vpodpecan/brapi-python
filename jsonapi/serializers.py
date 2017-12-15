@@ -112,7 +112,7 @@ class TrialDetailsSerializer(TrialSummarySerializer):
         return datasetAuthorship_fields
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class StudyDetails_LocationSerializer(serializers.ModelSerializer):
     additionalInfo = serializers.SerializerMethodField()
 
     def get_additionalInfo(self, obj):
@@ -126,7 +126,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class StudyDetailsSerializer(serializers.ModelSerializer):
     contacts = Trial_TrialContactSerializer(source='studycontact_set', many=True)  # can be reused from Trial
-    location = LocationSerializer(source='locationDbId', many=False)
+    location = StudyDetails_LocationSerializer(source='locationDbId', many=False)
     studyDescription = serializers.CharField(source='description')
     additionalInfo = serializers.SerializerMethodField()
     lastUpdate = serializers.SerializerMethodField()
@@ -249,3 +249,17 @@ class Study_GermplasmSerializer(serializers.ModelSerializer):
         #           "germplasmPUI", "synonyms"]
         fields = ['germplasmDbId', "germplasmName", "pedigree", "seedSource", "accessionNumber",
                   "germplasmPUI", "synonyms"]
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    locationType = serializers.CharField(source='type')
+    additionalInfo = serializers.SerializerMethodField()
+
+    def get_additionalInfo(self, obj):
+        return collect_additional_info(obj.locationadditionalinfo_set.all())
+
+    class Meta:
+        model = models.Location
+        safe = False
+        # fields = []
+        exclude = ['cropDbId']

@@ -498,3 +498,17 @@ class StudyGermplasm(GET_URLPARAMS_response, UnsafeTemplateView):
     def get_objects_GET(self, requestDict, **kwargs):
         study = models.Study.objects.get(studyDbId=kwargs.get('studyDbId'))
         return study.cropDbId.germplasm_set.all()
+
+
+class LocationList(GET_response, TemplateView):
+    model = models.Location
+    serializer = serializers.LocationSerializer
+    get_parameters = ['locationType']
+
+    def get_objects_GET(self, requestDict):
+        query = Q()
+        if 'locationType' in requestDict:
+            query &= Q(type=requestDict['locationType'])
+
+        objects = self.model.objects.filter(query)
+        return objects
