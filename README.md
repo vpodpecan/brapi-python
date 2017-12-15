@@ -196,7 +196,56 @@ We will use the `uWSGI` applicaton server to serve the requests comming to our D
 
 3.  If you want to start uWSGI at boot simply add the command to your `rc.local` script.
 
-    For a better integration with your system's services manager please consult the official uWSGI documentation: [https://uwsgi-docs.readthedocs.io/en/latest/](https://uwsgi-docs.readthedocs.io/en/latest/)
+For a better integration with your system's services manager please consult the official uWSGI documentation: [https://uwsgi-docs.readthedocs.io/en/latest/](https://uwsgi-docs.readthedocs.io/en/latest/). If your Linux uses `systemd` (as newer Ubuntus do), you can set up uWSGI as a system service and configure the emperor as described here:
+
+1.  Create a `systemd` service file `/etc/systemd/system/emperor.uwsgi.service`:
+
+    ```sh
+    sudo nano /etc/systemd/system/emperor.uwsgi.service
+    ```
+    with the content:
+    ```
+    [Unit]
+    Description=uWSGI Emperor
+    After=syslog.target
+
+    [Service]
+    ExecStart=/root/uwsgi/uwsgi --ini /etc/uwsgi/emperor.ini
+    # Requires systemd version 211 or newer
+    RuntimeDirectory=uwsgi
+    Restart=always
+    KillSignal=SIGQUIT
+    Type=notify
+    StandardError=syslog
+    NotifyAccess=all
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+2.  Create the `emperor.ini` file:
+    ```
+    sudo nano /etc/uwsgi/emperor.ini
+    ```
+    with the content:
+    ```
+    [uwsgi]
+    emperor = /etc/uwsgi/vassals
+    uid = www-data
+    gid = www-data        
+    ```
+3.  Link your `uwsgi.conf` into the `vassals` directory:
+    ```sh
+    cd /etc/uwsgi/vassals    
+    sudo ln -s /srv/django-projects/brapi/conf/uwsgi.ini brapi.uwsgi.ini
+    ```
+4.  Run the emperor service:
+    ```sh
+    sudo systemctl start emperor.uwsgi.service
+    ```
+    and check its status:
+    ```sh
+    sudo systemctl status emperor.uwsgi.service
+    ```
 
 
 #### How to update an existing installation
@@ -216,7 +265,11 @@ Updating a working installation is easy. The following steps are required:
     python manage.py migrate
     ```
 
-3.  Restart uWSGI and nginx
+3.  Restart uWSGI and nginx:
+    ```sh
+    sudo systemctl restart emperor.uwsgi.service
+    sudo service nginx restart
+    ```
 
 
 #### Database backup and restore
