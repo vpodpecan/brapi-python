@@ -1,3 +1,4 @@
+import dateparser
 from rest_framework import serializers
 
 from jsonapi import models
@@ -22,6 +23,11 @@ def bool2text(x):
     return str(x).lower()
 
 
+def date_from_string(datestring, timestamp=False):
+    dateobj = dateparser.parse(datestring) if timestamp else dateparser.parse(datestring).date()
+    return dateobj.isoformat()
+
+
 class Germplasm_DonorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Donor
@@ -34,6 +40,10 @@ class GermplasmDetailsSerializer(serializers.ModelSerializer):
     donors = Germplasm_DonorSerializer(many=True, source='donor_set')
     taxonIds = serializers.SerializerMethodField()
     synonyms = serializers.SerializerMethodField()
+    acquisitionDate = serializers.SerializerMethodField()  # change to DateField once the DB field is of date type
+
+    def get_acquisitionDate(self, obj):
+        return date_from_string(obj.acquisitionDate)
 
     def get_taxonIds(self, obj):
         data = []
@@ -145,7 +155,7 @@ class StudyDetailsSerializer(serializers.ModelSerializer):
     def get_lastUpdate(self, obj):
         lastUpdate_fields = {}
         lastUpdate_fields['version'] = obj.lastUpdateVersion
-        lastUpdate_fields['timestamp'] = obj.lastUpdateTimestamp
+        lastUpdate_fields['timestamp'] = date_from_string(obj.lastUpdateTimestamp, timestamp=True)
         return lastUpdate_fields
 
     def get_additionalInfo(self, obj):
