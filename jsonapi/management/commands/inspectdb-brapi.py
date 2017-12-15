@@ -132,9 +132,9 @@ class Command(BaseCommand):
                             else table2model(relations[column_name][1])
                         )
                         if rel_to in known_models:
-                            field_type = "ForeignKey('%s'" % rel_to
+                            field_type = "ForeignKey('%s', on_delete=models.CASCADE" % rel_to
                         else:
-                            field_type = "ForeignKey('%s'" % rel_to
+                            field_type = "ForeignKey('%s', on_delete=models.CASCADE" % rel_to
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.

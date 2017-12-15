@@ -18,7 +18,7 @@ from django.db import models
 
 
 class Contact(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     contactDbId = models.TextField(primary_key=True, verbose_name=' contactDbId')
     name = models.TextField(blank=True, verbose_name=' name')
     email = models.TextField(blank=True, verbose_name=' email')
@@ -39,8 +39,8 @@ class Crop(models.Model):
 
 
 class Donor(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' germplasmDbId')
     donorAccessionNumber = models.TextField(blank=True, verbose_name=' donorAccessionNumber')
     donorInstituteCode = models.TextField(blank=True, verbose_name=' donorInstituteCode')
     donorGermplasmPUI = models.TextField(blank=True, verbose_name=' donorGermplasmPUI')
@@ -50,7 +50,7 @@ class Donor(models.Model):
 
 
 class Germplasm(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     germplasmDbId = models.TextField(primary_key=True, verbose_name=' germplasmDbId')
     germplasmPUI = models.TextField(blank=True, verbose_name=' germplasmPUI')
     germplasmName = models.TextField(verbose_name=' germplasmName')
@@ -79,8 +79,8 @@ class Germplasm(models.Model):
 
 
 class GermplasmAttribute(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    attributeCategoryDbId = models.ForeignKey('GermplasmAttributeCategory', verbose_name=' attributeCategoryDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    attributeCategoryDbId = models.ForeignKey('GermplasmAttributeCategory', on_delete=models.CASCADE, verbose_name=' attributeCategoryDbId')
     attributeDbId = models.TextField(primary_key=True, verbose_name=' attributeDbId')
     code = models.TextField(blank=True, verbose_name=' code')
     uri = models.TextField(blank=True, verbose_name=' uri')
@@ -94,7 +94,7 @@ class GermplasmAttribute(models.Model):
 
 
 class GermplasmAttributeCategory(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     attributeCategoryDbId = models.TextField(primary_key=True, verbose_name=' attributeCategoryDbId')
     attributeCategoryName = models.TextField(blank=True, verbose_name=' attributeCategoryName')
 
@@ -106,9 +106,9 @@ class GermplasmAttributeCategory(models.Model):
 
 
 class GermplasmAttributeValue(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
-    attributeDbId = models.ForeignKey('GermplasmAttribute', verbose_name=' attributeDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' germplasmDbId')
+    attributeDbId = models.ForeignKey('GermplasmAttribute', on_delete=models.CASCADE, verbose_name=' attributeDbId')
     determinedDate = models.TextField(blank=True, verbose_name=' determinedDate')
     value = models.TextField(verbose_name=' value')
 
@@ -117,7 +117,7 @@ class GermplasmAttributeValue(models.Model):
 
 
 class Location(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     locationDbId = models.TextField(primary_key=True, verbose_name=' locationDbId')
     type = models.TextField(blank=True, verbose_name=' type')
     name = models.TextField(blank=True, verbose_name=' name')
@@ -135,8 +135,8 @@ class Location(models.Model):
 
 
 class LocationAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    locationDbId = models.ForeignKey('Location', verbose_name=' locationDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    locationDbId = models.ForeignKey('Location', on_delete=models.CASCADE, verbose_name=' locationDbId')
     key = models.TextField(verbose_name=' key')
     value = models.TextField(verbose_name=' value')
 
@@ -148,7 +148,7 @@ class LocationAdditionalInfo(models.Model):
 
 
 class Map(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     mapDbId = models.TextField(primary_key=True, verbose_name=' mapDbId')
 
     def __str__(self):
@@ -156,7 +156,7 @@ class Map(models.Model):
 
 
 class Marker(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     markerDbId = models.TextField(primary_key=True, verbose_name=' markerDbId')
     defaultDisplayName = models.TextField(blank=True, verbose_name=' defaultDisplayName')
     type = models.TextField(blank=True, verbose_name=' type')
@@ -169,7 +169,7 @@ class Marker(models.Model):
 
 
 class Markerprofile(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     markerProfileDbId = models.TextField(primary_key=True, verbose_name=' markerProfileDbId')
 
     def __str__(self):
@@ -177,7 +177,7 @@ class Markerprofile(models.Model):
 
 
 class Method(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     methodDbId = models.TextField(primary_key=True, verbose_name=' methodDbId')
 
     def __str__(self):
@@ -185,12 +185,12 @@ class Method(models.Model):
 
 
 class Observation(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
-    observationVariableDbId = models.ForeignKey('ObservationVariable', verbose_name=' observationVariableDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', on_delete=models.CASCADE, verbose_name=' observationUnitDbId')
+    observationVariableDbId = models.ForeignKey('ObservationVariable', on_delete=models.CASCADE, verbose_name=' observationVariableDbId')
     observationTimeStamp = models.TextField(blank=True, verbose_name=' observationTimeStamp')
     observationDbId = models.TextField(primary_key=True, verbose_name=' observationDbId')
-    seasonDbId = models.ForeignKey('Season', verbose_name=' seasonDbId')
+    seasonDbId = models.ForeignKey('Season', on_delete=models.CASCADE, verbose_name=' seasonDbId')
     collector = models.TextField(blank=True, verbose_name=' collector')
     value = models.TextField(blank=True, verbose_name=' value')
 
@@ -199,9 +199,9 @@ class Observation(models.Model):
 
 
 class ObservationUnit(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
-    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', on_delete=models.CASCADE,  verbose_name=' studyDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' germplasmDbId')
     observationUnitDbId = models.TextField(primary_key=True, verbose_name=' observationUnitDbId')
     name = models.TextField(verbose_name=' name')
     observationLevel = models.TextField(blank=True, verbose_name=' observationUnitLevel')
@@ -220,8 +220,8 @@ class ObservationUnit(models.Model):
 
 
 class Treatment(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', on_delete=models.CASCADE, verbose_name=' observationUnitDbId')
     factor = models.TextField(verbose_name=' factor')
     modality = models.TextField(verbose_name=' modality')
 
@@ -230,8 +230,8 @@ class Treatment(models.Model):
 
 
 class ObservationUnitXref(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    observationUnitDbId = models.ForeignKey('ObservationUnit', verbose_name=' observationUnitDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    observationUnitDbId = models.ForeignKey('ObservationUnit', on_delete=models.CASCADE, verbose_name=' observationUnitDbId')
     source = models.TextField(verbose_name=' source')
     id = models.TextField(primary_key=True, verbose_name=' id')
 
@@ -240,20 +240,20 @@ class ObservationUnitXref(models.Model):
 
 
 class ObservationVariable(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    ontologyDbId = models.ForeignKey('Ontology', verbose_name=' ontologyDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    ontologyDbId = models.ForeignKey('Ontology', on_delete=models.CASCADE, verbose_name=' ontologyDbId')
     observationVariableDbId = models.TextField(primary_key=True, verbose_name=' observationVariableDbId')
     observationVariableName = models.TextField(blank=True, verbose_name=' observationVariableName')
-    traitDbId = models.ForeignKey('Trait', verbose_name=' traitDbId')
-    methodDbId = models.ForeignKey('Method', verbose_name=' methodDbId')
-    scaleDbId = models.ForeignKey('Scale', verbose_name=' scaleDbId')
+    traitDbId = models.ForeignKey('Trait', on_delete=models.CASCADE, verbose_name=' traitDbId')
+    methodDbId = models.ForeignKey('Method', on_delete=models.CASCADE, verbose_name=' methodDbId')
+    scaleDbId = models.ForeignKey('Scale', on_delete=models.CASCADE, verbose_name=' scaleDbId')
 
     def __str__(self):
         return '{}'.format(self.pk)
 
 
 class Ontology(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     ontologyDbId = models.TextField(primary_key=True, verbose_name=' ontologyDbId')
     name = models.TextField(verbose_name=' name')
 
@@ -265,18 +265,18 @@ class Ontology(models.Model):
 
 
 class Pedigree(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId', related_name='pedigreeObject')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' germplasmDbId', related_name='pedigreeObject')
     pedigree = models.TextField(verbose_name=' pedigree')
-    parent1Id = models.ForeignKey('Germplasm', verbose_name=' parent1Id', related_name='pedigreeChild1')
-    parent2Id = models.ForeignKey('Germplasm', verbose_name=' parent2Id', related_name='pedigreeChild2')
+    parent1Id = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' parent1Id', related_name='pedigreeChild1')
+    parent2Id = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' parent2Id', related_name='pedigreeChild2')
 
     def __str__(self):
         return '{}: {}'.format(self.pk, self.pedigree[:15])
 
 
 class Program(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     programDbId = models.TextField(primary_key=True, verbose_name=' programDbId')
     name = models.TextField(verbose_name=' name')
     abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
@@ -288,7 +288,7 @@ class Program(models.Model):
 
 
 class Sample(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     sampleDbId = models.TextField(primary_key=True, verbose_name=' sampleDbId')
 
     def __str__(self):
@@ -296,7 +296,7 @@ class Sample(models.Model):
 
 
 class Scale(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     scaleDbId = models.TextField(primary_key=True, verbose_name=' scaleDbId')
 
     def __str__(self):
@@ -304,7 +304,7 @@ class Scale(models.Model):
 
 
 class Season(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop',on_delete=models.CASCADE,  verbose_name=' cropDbId')
     seasonDbId = models.TextField(primary_key=True, verbose_name=' seasonDbId')
     year = models.TextField(blank=True, verbose_name=' year')
     season = models.TextField(blank=True, verbose_name=' season')
@@ -314,10 +314,10 @@ class Season(models.Model):
 
 
 class Study(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
-    locationDbId = models.ForeignKey('Location', verbose_name=' locationDbId')
-    studyType = models.ForeignKey('StudyType', verbose_name=' studyType')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', on_delete=models.CASCADE, verbose_name=' trialDbId')
+    locationDbId = models.ForeignKey('Location', on_delete=models.CASCADE, verbose_name=' locationDbId')
+    studyType = models.ForeignKey('StudyType', on_delete=models.CASCADE, verbose_name=' studyType')
     studyDbId = models.TextField(primary_key=True, verbose_name=' studyDbId')
     name = models.TextField(verbose_name=' name')
     description = models.TextField(blank=True, verbose_name=' description')
@@ -336,8 +336,8 @@ class Study(models.Model):
 
 
 class StudyAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', on_delete=models.CASCADE, verbose_name=' studyDbId')
     key = models.TextField(verbose_name=' key')
     value = models.TextField(verbose_name=' value')
 
@@ -349,17 +349,17 @@ class StudyAdditionalInfo(models.Model):
 
 
 class StudyContact(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
-    contactDbId = models.ForeignKey('Contact', verbose_name=' contactDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', on_delete=models.CASCADE, verbose_name=' studyDbId')
+    contactDbId = models.ForeignKey('Contact', on_delete=models.CASCADE, verbose_name=' contactDbId')
 
     def __str__(self):
         return '{}'.format(self.pk)
 
 
 class StudyDataLink(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', on_delete=models.CASCADE, verbose_name=' studyDbId')
     name = models.TextField(blank=True, verbose_name=' name')
     type = models.TextField(blank=True, verbose_name=' type')
     url = models.TextField(verbose_name=' url')
@@ -369,16 +369,16 @@ class StudyDataLink(models.Model):
 
 
 class StudySeason(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    studyDbId = models.ForeignKey('Study', verbose_name=' studyDbId')
-    seasonDbId = models.ForeignKey('Season', verbose_name=' seasonDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    studyDbId = models.ForeignKey('Study', on_delete=models.CASCADE, verbose_name=' studyDbId')
+    seasonDbId = models.ForeignKey('Season', on_delete=models.CASCADE, verbose_name=' seasonDbId')
 
     def __str__(self):
         return '{}'.format(self.pk)
 
 
 class StudyType(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     name = models.TextField(primary_key=True, verbose_name=' name')
     description = models.TextField(blank=True, verbose_name=' description')
 
@@ -387,7 +387,7 @@ class StudyType(models.Model):
 
 
 class TaxonXref(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     taxonDbId = models.TextField(primary_key=True, verbose_name=' taxonDbId')
     source = models.TextField(verbose_name=' source')
     rank = models.TextField(blank=True, verbose_name=' rank')
@@ -397,9 +397,9 @@ class TaxonXref(models.Model):
 
 
 class TaxonXrefGermplasm(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    taxonDbId = models.ForeignKey('TaxonXref', verbose_name=' taxonDbId')
-    germplasmDbId = models.ForeignKey('Germplasm', verbose_name=' germplasmDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    taxonDbId = models.ForeignKey('TaxonXref', on_delete=models.CASCADE, verbose_name=' taxonDbId')
+    germplasmDbId = models.ForeignKey('Germplasm', on_delete=models.CASCADE, verbose_name=' germplasmDbId')
 
     def __str__(self):
         return '{}'.format(self.pk)
@@ -409,7 +409,7 @@ class TaxonXrefGermplasm(models.Model):
 
 
 class Trait(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
     traitDbId = models.TextField(primary_key=True, verbose_name=' traitDbId')
     name = models.TextField(blank=True, verbose_name=' name')
 
@@ -418,8 +418,8 @@ class Trait(models.Model):
 
 
 class Trial(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    programDbId = models.ForeignKey('Program', verbose_name=' programDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    programDbId = models.ForeignKey('Program', on_delete=models.CASCADE, verbose_name=' programDbId')
     trialDbId = models.TextField(primary_key=True, verbose_name=' trialDbId')
     name = models.TextField(verbose_name=' name')
     startDate = models.TextField(blank=True, verbose_name=' startDate')
@@ -433,8 +433,8 @@ class Trial(models.Model):
 
 
 class TrialAdditionalInfo(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', on_delete=models.CASCADE, verbose_name=' trialDbId')
     key = models.TextField(verbose_name=' key')
     value = models.TextField(verbose_name=' value')
 
@@ -446,9 +446,9 @@ class TrialAdditionalInfo(models.Model):
 
 
 class TrialContact(models.Model):
-    cropDbId = models.ForeignKey('Crop', verbose_name=' cropDbId')
-    trialDbId = models.ForeignKey('Trial', verbose_name=' trialDbId')
-    contactDbId = models.ForeignKey('Contact', verbose_name=' contactDbId')
+    cropDbId = models.ForeignKey('Crop', on_delete=models.CASCADE, verbose_name=' cropDbId')
+    trialDbId = models.ForeignKey('Trial', on_delete=models.CASCADE, verbose_name=' trialDbId')
+    contactDbId = models.ForeignKey('Contact', on_delete=models.CASCADE, verbose_name=' contactDbId')
 
     def __str__(self):
         return '{}'.format(self.pk)
