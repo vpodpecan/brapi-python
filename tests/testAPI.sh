@@ -13,6 +13,19 @@ curl -G "$BASEURL"/brapi/v1/programs \
     --data-urlencode "abbreviation=P5" \
     | python3 -m json.tool > programs1.json
 
+# POST program search
+curl -H "Content-Type: application/json" -X POST "$BASEURL"/brapi/v1/programs-search \
+    -d '{"programDbId": "1",
+      "name": "Program 1",
+      "abbreviation" : "P1",
+      "objective" : "Global Population Improvement",
+      "leadPerson" : "G. Leader",
+      "pageSize": 1000,
+      "page": 0
+    }' \
+    | python3 -m json.tool > programs2.json
+
+
 # GET germplasm details by id
 curl "$BASEURL"/brapi/v1/germplasm/1 | python3 -m json.tool > germplasm1.json
 

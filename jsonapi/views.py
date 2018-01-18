@@ -267,6 +267,26 @@ class GermplasmSearch(GET_response, POST_JSON_response, UnsafeTemplateView):
         return self.model.objects.filter(Q(**qdict))
 
 
+class ProgramSearch(POST_JSON_response, UnsafeTemplateView):
+    model = models.Program
+    serializer = serializers.ProgramSerializer
+    post_json_parameters = ['programDbId', 'name', 'abbreviation', 'objective', 'leadPerson']
+
+    def get_objects_POST(self, requestDict):
+        query = Q()
+        distinct = False
+
+        for pn in self.post_json_parameters:
+            val = requestDict.get(pn)
+            if val is not None:
+                query &= Q(**{'{}'.format(pn): val})  # Q(attrName=val)
+
+        objects = self.model.objects.filter(query)
+        if distinct:
+            objects = objects.distinct()
+        return self.sortOrder(requestDict, objects)
+
+
 class ProgramList(GET_response, TemplateView):
     model = models.Program
     serializer = serializers.ProgramSerializer

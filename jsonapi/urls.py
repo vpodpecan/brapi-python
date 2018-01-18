@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^germplasm/(?P<germplasmDbId>[^ /]+)$', views.GermplasmDetails.as_view()),
     url(r'^germplasm-search$', views.GermplasmSearch.as_view()),
     url(r'^programs$', views.ProgramList.as_view()),
+    url(r'^programs-search$', views.ProgramSearch.as_view()),
     url(r'^trials/(?P<trialDbId>[^ /]+)$', views.TrialDetails.as_view()),
     url(r'^trials$', views.TrialList.as_view()),
     url(r'^studies$', views.StudyList.as_view()),
