@@ -25,7 +25,7 @@ def bool2text(x):
 
 def date_from_string(datestring, timestamp=False):
     dateobj = dateparser.parse(datestring) if timestamp else dateparser.parse(datestring)
-    return dateobj.date().isoformat() if dateobj is not None else None
+    return dateobj.date().isoformat() if dateobj is not None else ''
 
 
 class Germplasm_DonorSerializer(serializers.ModelSerializer):
