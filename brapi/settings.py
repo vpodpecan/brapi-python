@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'jsonapi.apps.JsonapiConfig',
+    'homepage.apps.HomepageConfig',
     'bootstrap_admin',
     'django.contrib.admin',
     'oauth2_provider',
@@ -43,7 +44,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'bootstrap3',
-    'django_extensions'
+    'django_extensions',
+    'ckeditor',
+    'ckeditor_uploader'
 ]
 
 MIDDLEWARE = [
@@ -147,5 +150,17 @@ MEDIA_URL = '/media/'
 BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'width': '100%',
+        'height': '600px',
+        'extraPlugins': 'image2'
+    },
+}
 
 from .local_settings import *

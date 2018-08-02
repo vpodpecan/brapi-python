@@ -16,11 +16,18 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
+
+from homepage.views import home
 
 urlpatterns = [
+    url(r'^$', home),
     url(r'^brapi/v1/', include('jsonapi.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     # url(r'^accounts/', include('django.contrib.auth.urls')),
     # url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
