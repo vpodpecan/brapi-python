@@ -1,6 +1,6 @@
 upstream django {
     #server 127.0.0.1:8001; # for a web port socket
-    server unix:///srv/django-projects/brapi/brapi.sock;
+    server unix:///tmp/brapi.sock;
 }
 
 # configuration of the server

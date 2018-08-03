@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'jsonapi.apps.JsonapiConfig',
-    'homepage.apps.HomepageConfig',
+    'pages.apps.PagesConfig',
     'bootstrap_admin',
     'django.contrib.admin',
     'oauth2_provider',

@@ -19,7 +19,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 
-from homepage.views import home
+from pages.views import home
 
 urlpatterns = [
     url(r'^$', home),
@@ -30,4 +30,7 @@ urlpatterns = [
     # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     # url(r'^accounts/', include('django.contrib.auth.urls')),
     # url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
