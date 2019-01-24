@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'bootstrap3',
     'django_extensions',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'iprestrict',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'iprestrict.middleware.IPRestrictMiddleware',
 ]
 
 ROOT_URLCONF = 'brapi.urls'
@@ -162,5 +164,7 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': 'image2'
     },
 }
+
+IPRESTRICT_GEOIP_ENABLED = False
 
 from .local_settings import *
