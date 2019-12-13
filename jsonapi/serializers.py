@@ -122,11 +122,28 @@ class TrialDetailsSerializer(TrialSummarySerializer):
         return datasetAuthorship_fields
 
 
-class StudyDetails_LocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
+    locationType = serializers.CharField(source='type')
     additionalInfo = serializers.SerializerMethodField()
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    altitude = serializers.IntegerField()
+    documentationURL = serializers.URLField()
 
     def get_additionalInfo(self, obj):
         return collect_additional_info(obj.locationadditionalinfo_set.all())
+
+    class Meta:
+        model = models.Location
+        safe = False
+        exclude = ['cropDbId']
+
+
+class StudyDetails_LocationSerializer(LocationSerializer):
+    # additionalInfo = serializers.SerializerMethodField()
+    #
+    # def get_additionalInfo(self, obj):
+    #     return collect_additional_info(obj.locationadditionalinfo_set.all())
 
     class Meta:
         model = models.Location
@@ -259,20 +276,3 @@ class Study_GermplasmSerializer(serializers.ModelSerializer):
         #           "germplasmPUI", "synonyms"]
         fields = ['germplasmDbId', "germplasmName", "pedigree", "seedSource", "accessionNumber",
                   "germplasmPUI", "synonyms"]
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    locationType = serializers.CharField(source='type')
-    additionalInfo = serializers.SerializerMethodField()
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
-    altitude = serializers.IntegerField()
-    documentationURL = serializers.URLField()
-
-    def get_additionalInfo(self, obj):
-        return collect_additional_info(obj.locationadditionalinfo_set.all())
-
-    class Meta:
-        model = models.Location
-        safe = False
-        exclude = ['cropDbId']
