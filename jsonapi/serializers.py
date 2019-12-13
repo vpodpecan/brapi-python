@@ -264,6 +264,10 @@ class Study_GermplasmSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     locationType = serializers.CharField(source='type')
     additionalInfo = serializers.SerializerMethodField()
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    altitude = serializers.IntegerField()
+    documentationURL = serializers.URLField()
 
     def get_additionalInfo(self, obj):
         return collect_additional_info(obj.locationadditionalinfo_set.all())

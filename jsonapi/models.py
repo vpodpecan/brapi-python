@@ -124,11 +124,17 @@ class Location(models.Model):
     abbreviation = models.TextField(blank=True, verbose_name=' abbreviation')
     countryCode = models.TextField(blank=True, verbose_name=' countryCode')
     countryName = models.TextField(blank=True, verbose_name=' countryName')
-    latitude = models.TextField(blank=True, verbose_name=' latitude')  # This field type is a guess.
-    longitude = models.TextField(blank=True, verbose_name=' longitude')  # This field type is a guess.
-    altitude = models.TextField(blank=True, verbose_name=' altitude')  # This field type is a guess.
+    latitude = models.TextField(blank=True, verbose_name=' latitude')
+    longitude = models.TextField(blank=True, verbose_name=' longitude')
+    altitude = models.TextField(blank=True, verbose_name=' altitude')
     instituteName = models.TextField(blank=True, verbose_name=' instituteName')
     instituteAddress = models.TextField(blank=True, verbose_name=' instituteAddress')
+
+    # added 13.12.2019
+    documentationURL = models.TextField(blank=True, verbose_name=' documentationURL')
+    locationName = models.TextField(blank=True, verbose_name=' locationName')
+    locationType = models.TextField(blank=True, verbose_name=' locationType')
+
 
     def __str__(self):
         return '{}: {}'.format(self.pk, self.name)
@@ -327,6 +333,9 @@ class Study(models.Model):
     license = models.TextField(blank=True, verbose_name=' license')
     lastUpdateVersion = models.TextField(blank=True, verbose_name=' lastUpdateVersion')
     lastUpdateTimestamp = models.TextField(blank=True, verbose_name=' lastUpdateTimestamp')
+
+    # added 13.12.2019
+    documentationURL = models.TextField(blank=True, verbose_name=' documentationURL')
 
     def __str__(self):
         return '{}: {}'.format(self.pk, self.name)
