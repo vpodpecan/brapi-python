@@ -1,4 +1,4 @@
-Django==1.11.23
+Django==1.11.29
 django-extensions==1.8.1
 bootstrap-admin==0.3.7.1
 djangorestframework==3.6.3
