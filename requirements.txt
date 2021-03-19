@@ -1,7 +1,7 @@
 Django==1.11.23
 django-extensions==1.8.1
 bootstrap-admin==0.3.7.1
-djangorestframework==3.6.3
+djangorestframework==3.11.2
 markdown==2.6.8
 django-filter==1.0.4
 Pygments==2.2.0
