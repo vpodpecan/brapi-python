@@ -15,6 +15,6 @@ uwsgi==2.0.15
 fabric3==1.13.1.post1
 psycopg2==2.7.3.1
 dateparser==0.6.0
-pillow==6.2.0
+pillow==9.3.0
 django-ckeditor==5.6.1
 django-iprestrict==1.7.0
